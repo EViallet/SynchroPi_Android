@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Rasp</string>
+    <string name="btn_connect">Connexion</string>
+    <string name="btn_send">Envoyer</string>
+</resources>
