@@ -47,8 +47,8 @@ public class MainActivity extends AppCompatActivity {
     View.OnClickListener connectListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            if(manager!=null)
-                manager.initBluetooth();
+            textView.setText(R.string.text_awaiting_connexion);
+            manager.initBluetooth();
         }
     };
 
@@ -68,20 +68,18 @@ public class MainActivity extends AppCompatActivity {
         interact.setOnClickListener(connectListener);
         textView = findViewById(R.id.txt);
         editText = findViewById(R.id.send);
+        manager = new BluetoothManager(this);
 
         registerReceiver(bluetoothStateChanged,new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED));
         checkPermission();
 
     }
 
-    private void initBluetoothManager() {
-        manager = new BluetoothManager(this);
-    }
-
-    public void connected(String uuids[]) {
+    public void connected() {
         interact.setOnClickListener(sendListener);
         interact.setText(R.string.btn_send);
-        textView.setText("in : "+uuids[0]+"\nout : "+uuids[1]);
+        textView.setText(R.string.text_connected);
+        manager.send("a");
     }
 
     public void setText(String text) {
@@ -92,19 +90,15 @@ public class MainActivity extends AppCompatActivity {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH) != PackageManager.PERMISSION_GRANTED) {
             if (!ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.BLUETOOTH))
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.BLUETOOTH}, BLUETOOTH_PERMISSION);
-        } else
-            initBluetoothManager();
+        }
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
         switch (requestCode) {
             case BLUETOOTH_PERMISSION: {
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    initBluetoothManager();
-                } else {
+                if (!(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED))
                     finish();
-                }
             }
         }
     }
