@@ -12,14 +12,14 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements MotorView.OnValueChanged, ButtonView.OnSwitch {
+
+    private final static boolean DEBUG_MODE = true;
 
     private static final int BLUETOOTH_PERMISSION = 0;
 
@@ -40,14 +40,16 @@ public class MainActivity extends AppCompatActivity {
     };
 
     BluetoothManager manager;
-    TextView textView;
-    EditText editText;
-    Button interact;
+    TextView debug_view;
+    EditText debug_text;
+    Button btn_connect;
+    MotorView motorController;
+    ButtonView motorSwitch;
 
     View.OnClickListener connectListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            textView.setText(R.string.text_awaiting_connexion);
+            debug_view.setText(R.string.text_awaiting_connexion);
             manager.initBluetooth();
         }
     };
@@ -55,7 +57,7 @@ public class MainActivity extends AppCompatActivity {
     View.OnClickListener sendListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            manager.send(editText.getText().toString());
+            manager.send(debug_text.getText().toString());
         }
     };
 
@@ -64,10 +66,16 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        interact = findViewById(R.id.btn);
-        interact.setOnClickListener(connectListener);
-        textView = findViewById(R.id.txt);
-        editText = findViewById(R.id.send);
+        btn_connect = findViewById(R.id.btn);
+        btn_connect.setOnClickListener(connectListener);
+        debug_view = findViewById(R.id.txt);
+        debug_text = findViewById(R.id.send);
+        motorController = findViewById(R.id.controller_motor);
+        motorController.setTitle("m_pwm");
+        motorController.setOnValueChangedListener(this);
+        motorSwitch = findViewById(R.id.switch_motor);
+        motorSwitch.setTitle("m_sw");
+        motorSwitch.setOnSwitchListener(this);
         manager = new BluetoothManager(this);
 
         registerReceiver(bluetoothStateChanged,new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED));
@@ -76,14 +84,43 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void connected() {
-        interact.setOnClickListener(sendListener);
-        interact.setText(R.string.btn_send);
-        textView.setText(R.string.text_connected);
-        manager.send("a");
+        manager.send("Connecting");
+        motorController.setVisibility(View.VISIBLE);
+        motorSwitch.setVisibility(View.VISIBLE);
+        if(DEBUG_MODE) {
+            debug_view.setText(R.string.text_connected);
+            debug_text.setVisibility(View.VISIBLE);
+            debug_view.setVisibility(View.VISIBLE);
+            btn_connect.setOnClickListener(sendListener);
+            btn_connect.setText(R.string.btn_send);
+        } else {
+            btn_connect.animate().translationX(400f).setDuration(500).start();
+        }
     }
 
     public void setText(String text) {
-        textView.append("\n"+text);
+        if(DEBUG_MODE)
+            debug_view.append("\n"+text);
+    }
+
+    public void onValueChanged(View v, int value) {
+        if(!manager.isConnected())
+            return;
+        switch(v.getId()) {
+            case R.id.controller_motor:
+                manager.send(motorController.getTitle(), value);
+                break;
+        }
+    }
+
+    public void onSwitch(View v, boolean isSwitched) {
+        if(!manager.isConnected())
+            return;
+        switch(v.getId()) {
+            case R.id.switch_motor:
+                manager.send(motorSwitch.getTitle(), isSwitched);
+                break;
+        }
     }
 
     private void checkPermission() {
@@ -107,6 +144,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        manager.send("Disconnecting");
         unregisterReceiver(bluetoothStateChanged);
     }
 

@@ -20,6 +20,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
 
+
+        android:visibility="gone"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="20dp"
         android:layout_below="@id/btn"/>
@@ -32,7 +34,28 @@
         android:text="-----"
         android:textColor="@android:color/black"
 
+        android:visibility="gone"
         android:layout_centerHorizontal="true"
         android:layout_below="@id/send"/>
+
+    <com.gueg.rasp.MotorView
+        android:id="@+id/controller_motor"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+
+        android:visibility="invisible"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"/>
+
+    <com.gueg.rasp.ButtonView
+        android:id="@+id/switch_motor"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+
+
+        android:visibility="invisible"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="20dp"/>
 
 </RelativeLayout>
