@@ -49,7 +49,7 @@ public class MainActivity extends AppCompatActivity implements MotorView.OnValue
     View.OnClickListener connectListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            debug_view.setText(R.string.text_awaiting_connexion);
+            btn_connect.setText(R.string.text_awaiting_connexion);
             manager.initBluetooth();
         }
     };
@@ -92,10 +92,14 @@ public class MainActivity extends AppCompatActivity implements MotorView.OnValue
             debug_text.setVisibility(View.VISIBLE);
             debug_view.setVisibility(View.VISIBLE);
             btn_connect.setOnClickListener(sendListener);
-            btn_connect.setText(R.string.btn_send);
+            btn_connect.setText(R.string.text_send);
         } else {
             btn_connect.animate().translationX(400f).setDuration(500).start();
         }
+    }
+
+    public void connectionFailed() {
+        btn_connect.setText(R.string.text_connect);
     }
 
     public void setText(String text) {
@@ -103,24 +107,16 @@ public class MainActivity extends AppCompatActivity implements MotorView.OnValue
             debug_view.append("\n"+text);
     }
 
-    public void onValueChanged(View v, int value) {
+    public void onValueChanged(MotorView v, int value) {
         if(!manager.isConnected())
             return;
-        switch(v.getId()) {
-            case R.id.controller_motor:
-                manager.send(motorController.getTitle(), value);
-                break;
-        }
+        manager.send(v.getTitle(), value);
     }
 
-    public void onSwitch(View v, boolean isSwitched) {
+    public void onSwitch(ButtonView v, boolean isSwitched) {
         if(!manager.isConnected())
             return;
-        switch(v.getId()) {
-            case R.id.switch_motor:
-                manager.send(motorSwitch.getTitle(), isSwitched);
-                break;
-        }
+        manager.send(v.getTitle(), isSwitched);
     }
 
     private void checkPermission() {

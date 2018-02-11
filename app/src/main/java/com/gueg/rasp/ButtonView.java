@@ -1,6 +1,5 @@
 package com.gueg.rasp;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -19,8 +18,9 @@ public class ButtonView extends View implements View.OnTouchListener {
     private Paint textPaint = new Paint();
 
     private String title = "Switch";
+    private boolean showTitle = true;
     private boolean switched = false;
-    private boolean allowSwitch = true;
+    private boolean allowClick = true;
     private OnSwitch listener;
 
     private float radius = -1f;
@@ -57,7 +57,7 @@ public class ButtonView extends View implements View.OnTouchListener {
 
     @Override
     public boolean onTouch(View v, MotionEvent e) {
-        if(!allowSwitch)
+        if(!allowClick)
             return false;
         switch (e.getAction()) {
             case MotionEvent.ACTION_DOWN:
@@ -126,15 +126,20 @@ public class ButtonView extends View implements View.OnTouchListener {
         }
 
         /* Drawing text */
-        if(textPaint.getTextSize()!=canvas.getWidth()/10)
-            textPaint.setTextSize(canvas.getWidth()/10);
-        canvas.drawText(title, (float)canvas.getWidth()/2f, (float)canvas.getHeight() - 20f, textPaint);
-
+        if(showTitle) {
+            if (textPaint.getTextSize() != canvas.getWidth() / 10)
+                textPaint.setTextSize(canvas.getWidth() / 10);
+            canvas.drawText(title, (float) canvas.getWidth() / 2f, (float) canvas.getHeight() - 20f, textPaint);
+        }
     }
 
     public void setTitle(String t) {
         title = t;
         invalidate();
+    }
+
+    public void setShowTitle(boolean st) {
+        showTitle = st;
     }
 
     public void setSwitched(boolean b) {
@@ -150,8 +155,8 @@ public class ButtonView extends View implements View.OnTouchListener {
         falseColor = c;
     }
 
-    public void setAllowSwitch(boolean as) {
-        allowSwitch = as;
+    public void setAllowClick(boolean as) {
+        allowClick = as;
     }
 
     public boolean getSwitched() {
@@ -171,7 +176,7 @@ public class ButtonView extends View implements View.OnTouchListener {
     }
 
     public interface OnSwitch {
-        void onSwitch(View v, boolean isEnabled);
+        void onSwitch(ButtonView v, boolean isEnabled);
     }
 
 }

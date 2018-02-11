@@ -20,7 +20,6 @@ public class MotorView extends View implements View.OnTouchListener {
 
     private Paint paint = new Paint();
     private Paint whitePaint = new Paint();
-    private Paint textPaint = new Paint();
 
     private Path triangle = new Path();
     private Paint trianglePaint = new Paint();
@@ -35,9 +34,11 @@ public class MotorView extends View implements View.OnTouchListener {
     private float lastAngle = angle;
     private Point center;
 
+    private Paint textPaint = new Paint();
     private String title = "MV";
+    private boolean showTitle = true;
     private int value = 0;
-    private boolean updateValue = true;
+    private boolean allowClick = true;
     private OnValueChanged listener;
 
     private int colors[] = new int[] {0xff33cc33, 0xff99ff33, 0xffffff00, 0xffff9900, 0xffff0000, 0xffcc0000};
@@ -82,7 +83,7 @@ public class MotorView extends View implements View.OnTouchListener {
                     angle = 225;
                 lastAngle = angle;
 
-                if (updateValue) {
+                if (allowClick) {
                     float normalizedAngle = angle;
                     if (-90 <= angle && angle <= 0)
                         normalizedAngle += MAX_ANGLE;
@@ -122,14 +123,16 @@ public class MotorView extends View implements View.OnTouchListener {
         canvas.drawCircle(circleRadius, (float)canvas.getHeight()/2f, (float)canvas.getHeight()/3f, whitePaint);
 
         /* Drawing text */
-        if(textPaint.getTextSize()!=canvas.getWidth()/10)
-            textPaint.setTextSize(canvas.getWidth()/10);
-        canvas.drawText(title, (float)canvas.getWidth()/2f, (float)canvas.getHeight()-20f, textPaint);
-        textPaint.setFakeBoldText(true);
-        textPaint.setTextSize(80f);
-        canvas.drawText(Integer.toString(value), (float)canvas.getWidth()/2f, (float)canvas.getHeight()*3f/4f, textPaint);
-        textPaint.setFakeBoldText(false);
-        textPaint.setTextSize(60f);
+        if(showTitle) {
+            if (textPaint.getTextSize() != canvas.getWidth() / 10)
+                textPaint.setTextSize(canvas.getWidth() / 10);
+            canvas.drawText(title, (float) canvas.getWidth() / 2f, (float) canvas.getHeight() - 20f, textPaint);
+            textPaint.setFakeBoldText(true);
+            textPaint.setTextSize(80f);
+            canvas.drawText(Integer.toString(value), (float) canvas.getWidth() / 2f, (float) canvas.getHeight() * 3f / 4f, textPaint);
+            textPaint.setFakeBoldText(false);
+            textPaint.setTextSize(60f);
+        }
 
         /* Drawing triangle */
         if(triangleSize==-1f)
@@ -156,13 +159,17 @@ public class MotorView extends View implements View.OnTouchListener {
         invalidate();
     }
 
+    public void setShowTitle(boolean st) {
+        showTitle = st;
+    }
+
     public void setValue(int v) {
         value = v;
         invalidate();
     }
 
-    public void setUpdateValue(boolean uv) {
-        updateValue = uv;
+    public void setAllowClick(boolean uv) {
+        allowClick = uv;
     }
 
     public int getValue() {
@@ -180,7 +187,7 @@ public class MotorView extends View implements View.OnTouchListener {
 
 
     public interface OnValueChanged {
-        void onValueChanged(View v, int value);
+        void onValueChanged(MotorView v, int value);
     }
 
 }
