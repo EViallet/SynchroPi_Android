@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -14,12 +15,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
-import android.widget.TextView;
+import android.widget.Toast;
 
-public class MainActivity extends AppCompatActivity implements MotorView.OnValueChanged, ButtonView.OnSwitch {
-
-    private final static boolean DEBUG_MODE = true;
+public class MainActivity extends AppCompatActivity implements MotorView.OnValueChanged, SwitchView.OnSwitch {
 
     private static final int BLUETOOTH_PERMISSION = 0;
 
@@ -40,26 +38,23 @@ public class MainActivity extends AppCompatActivity implements MotorView.OnValue
     };
 
     BluetoothManager manager;
-    TextView debug_view;
-    EditText debug_text;
     Button btn_connect;
+    ButtonView btn_shutdown;
+    ButtonView btn_disconnect;
     MotorView motorController;
-    ButtonView motorSwitch;
+    SwitchView motorSwitch;
+    MotorView motorController2;
+    SwitchView motorSwitch2;
+    SwitchView ledSwitch;
 
     View.OnClickListener connectListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            btn_connect.setText(R.string.text_awaiting_connexion);
+            Toast.makeText(MainActivity.this, R.string.text_awaiting_connexion, Toast.LENGTH_SHORT).show();
             manager.initBluetooth();
         }
     };
 
-    View.OnClickListener sendListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            manager.send(debug_text.getText().toString());
-        }
-    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,14 +63,44 @@ public class MainActivity extends AppCompatActivity implements MotorView.OnValue
 
         btn_connect = findViewById(R.id.btn);
         btn_connect.setOnClickListener(connectListener);
-        debug_view = findViewById(R.id.txt);
-        debug_text = findViewById(R.id.send);
         motorController = findViewById(R.id.controller_motor);
-        motorController.setTitle("m_pwm");
+        motorController.setTitle("Moteur G").setCmdId("m_pwm");
         motorController.setOnValueChangedListener(this);
         motorSwitch = findViewById(R.id.switch_motor);
-        motorSwitch.setTitle("m_sw");
+        motorSwitch.setTitle("Moteur G").setCmdId("m_sw");
         motorSwitch.setOnSwitchListener(this);
+        motorController2 = findViewById(R.id.controller_motor2);
+        motorController2.setTitle("Moteur D").setCmdId("m_pwm2");
+        motorController2.setOnValueChangedListener(this);
+        motorSwitch2 = findViewById(R.id.switch_motor2);
+        motorSwitch2.setTitle("Moteur D").setCmdId("m_sw2");
+        motorSwitch2.setOnSwitchListener(this);
+        ledSwitch = findViewById(R.id.switch_led);
+        ledSwitch.setTitle("Led").setCmdId("l_sw");
+        ledSwitch.setOnSwitchListener(this);
+        ledSwitch.setCheckedColor(Color.CYAN).setUncheckedColor(Color.GRAY);
+        btn_shutdown = findViewById(R.id.btn_shutdown);
+        btn_shutdown.setTitle("OFF");
+        btn_shutdown.setActionlistener(new ButtonView.OnAction() {
+            @Override
+            public void clicked() {
+                if(!manager.isConnected())
+                    return;
+                manager.send("Shutdown");
+                disconnected();
+            }
+        });
+        btn_shutdown = findViewById(R.id.btn_disconnect);
+        btn_shutdown.setTitle("DECO");
+        btn_shutdown.setActionlistener(new ButtonView.OnAction() {
+            @Override
+            public void clicked() {
+                if(!manager.isConnected())
+                    return;
+                manager.send("Disconnecting");
+                disconnected();
+            }
+        });
         manager = new BluetoothManager(this);
 
         registerReceiver(bluetoothStateChanged,new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED));
@@ -84,39 +109,43 @@ public class MainActivity extends AppCompatActivity implements MotorView.OnValue
     }
 
     public void connected() {
-        manager.send("Connecting");
+        Toast.makeText(this, R.string.text_connected, Toast.LENGTH_SHORT).show();
+        manager.send(".");
         motorController.setVisibility(View.VISIBLE);
         motorSwitch.setVisibility(View.VISIBLE);
-        if(DEBUG_MODE) {
-            debug_view.setText(R.string.text_connected);
-            debug_text.setVisibility(View.VISIBLE);
-            debug_view.setVisibility(View.VISIBLE);
-            btn_connect.setOnClickListener(sendListener);
-            btn_connect.setText(R.string.text_send);
-        } else {
-            btn_connect.animate().translationX(400f).setDuration(500).start();
-        }
+        motorController2.setVisibility(View.VISIBLE);
+        motorSwitch2.setVisibility(View.VISIBLE);
+        ledSwitch.setVisibility(View.VISIBLE);
+        btn_shutdown.setVisibility(View.VISIBLE);
+        btn_connect.setVisibility(View.GONE);
     }
 
     public void connectionFailed() {
-        btn_connect.setText(R.string.text_connect);
+        Toast.makeText(this, R.string.text_failed, Toast.LENGTH_SHORT).show();
     }
 
-    public void setText(String text) {
-        if(DEBUG_MODE)
-            debug_view.append("\n"+text);
+    public void disconnected() {
+        Toast.makeText(this, R.string.text_disconnected, Toast.LENGTH_SHORT).show();
+        motorController.setVisibility(View.GONE);
+        motorSwitch.setVisibility(View.GONE);
+        motorController2.setVisibility(View.GONE);
+        motorSwitch2.setVisibility(View.GONE);
+        ledSwitch.setVisibility(View.GONE);
+        btn_shutdown.setVisibility(View.GONE);
+        btn_connect.setVisibility(View.VISIBLE);
     }
+
 
     public void onValueChanged(MotorView v, int value) {
         if(!manager.isConnected())
             return;
-        manager.send(v.getTitle(), value);
+        manager.send(v.getCmdId(), value);
     }
 
-    public void onSwitch(ButtonView v, boolean isSwitched) {
+    public void onSwitch(SwitchView v, boolean isSwitched) {
         if(!manager.isConnected())
             return;
-        manager.send(v.getTitle(), isSwitched);
+        manager.send(v.getCmdId(), isSwitched);
     }
 
     private void checkPermission() {

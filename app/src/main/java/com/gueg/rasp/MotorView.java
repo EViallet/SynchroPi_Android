@@ -16,7 +16,7 @@ import android.view.View;
 
 @SuppressWarnings("unused")
 @SuppressLint("DrawAllocation")
-public class MotorView extends View implements View.OnTouchListener {
+public class MotorView extends ControlView implements View.OnTouchListener {
 
     private Paint paint = new Paint();
     private Paint whitePaint = new Paint();
@@ -34,11 +34,7 @@ public class MotorView extends View implements View.OnTouchListener {
     private float lastAngle = angle;
     private Point center;
 
-    private Paint textPaint = new Paint();
-    private String title = "MV";
-    private boolean showTitle = true;
     private int value = 0;
-    private boolean allowClick = true;
     private OnValueChanged listener;
 
     private int colors[] = new int[] {0xff33cc33, 0xff99ff33, 0xffffff00, 0xffff9900, 0xffff0000, 0xffcc0000};
@@ -60,9 +56,6 @@ public class MotorView extends View implements View.OnTouchListener {
         triangle.setFillType(Path.FillType.EVEN_ODD);
         trianglePaint.setColor(Color.GRAY);
         trianglePaint.setStyle(Paint.Style.FILL);
-
-        textPaint.setColor(Color.BLACK);
-        textPaint.setTextAlign(Paint.Align.CENTER);
 
         setOnTouchListener(this);
     }
@@ -154,37 +147,22 @@ public class MotorView extends View implements View.OnTouchListener {
         canvas.drawPath(triangle, trianglePaint);
     }
 
-    public void setTitle(String t) {
-        title = t;
-        invalidate();
-    }
-
-    public void setShowTitle(boolean st) {
-        showTitle = st;
-    }
 
     public void setValue(int v) {
         value = v;
         invalidate();
     }
 
-    public void setAllowClick(boolean uv) {
-        allowClick = uv;
-    }
-
     public int getValue() {
         return value;
     }
 
-    public String getTitle() {
-        return title;
-    }
+
+
 
     public void setOnValueChangedListener(OnValueChanged listener) {
         this.listener = listener;
     }
-
-
 
     public interface OnValueChanged {
         void onValueChanged(MotorView v, int value);

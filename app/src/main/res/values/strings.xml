@@ -2,6 +2,8 @@
     <string name="app_name">Rasp</string>
     <string name="text_connect">Connexion</string>
     <string name="text_connected">Connecté!</string>
+    <string name="text_disconnected">Déconnecté!</string>
     <string name="text_awaiting_connexion">En attente…</string>
-    <string name="text_send">Envoyer</string>
+    <string name="text_shutdown">Eteindre</string>
+    <string name="text_failed">Echec de la connexion</string>
 </resources>

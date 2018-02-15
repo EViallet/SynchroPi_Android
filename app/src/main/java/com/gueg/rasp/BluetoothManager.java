@@ -44,6 +44,7 @@ public class BluetoothManager {
             try {
                 int byteCount = in.available();
                 if (byteCount > 0) {
+                    Log.d(TAG,"Receiving "+byteCount+" bytes...");
                     byte[] raw = new byte[byteCount];
                     in.read(raw);
                     final String string = new String(raw, "ASCII");
@@ -91,15 +92,15 @@ public class BluetoothManager {
     public void initBluetooth() {
         try {
             BluetoothServerSocket server = bluetoothAdapter.listenUsingRfcommWithServiceRecord("BTServer", UUID.fromString(PI_UUID));
-            BluetoothSocket socket = server.accept(5000);
+            BluetoothSocket socket = server.accept(20000);
             in = socket.getInputStream();
             out = socket.getOutputStream();
-            bluetoothHandler.post(checkIncomingData);
             isConnected = true;
+            bluetoothHandler.post(checkIncomingData);
             activity.connected();
         } catch(IOException e) {
             activity.connectionFailed();
-            Log.e(TAG,"Couldn't create BTServer :",e);
+            Log.w(TAG,"Couldn't create BTServer :",e);
         }
     }
 
@@ -113,6 +114,10 @@ public class BluetoothManager {
             Log.d(TAG,"Sending : "+cmd);
         } catch(IOException e) {
             e.printStackTrace();
+            if(e.toString().contains("Broken Pipe")) {
+                activity.disconnected();
+                isConnected = false;
+            }
         }
     }
 
@@ -126,6 +131,10 @@ public class BluetoothManager {
             Log.d(TAG,"Sending : "+cmd+" from "+id);
         } catch(IOException e) {
             e.printStackTrace();
+            if(e.toString().contains("Broken Pipe")) {
+                activity.disconnected();
+                isConnected = false;
+            }
         }
     }
 
@@ -138,6 +147,10 @@ public class BluetoothManager {
             Log.d(TAG,"Sending : "+cmd+" from "+id);
         } catch(IOException e) {
             e.printStackTrace();
+            if(e.toString().contains("Broken Pipe")) {
+                activity.disconnected();
+                isConnected = false;
+            }
         }
     }
 
@@ -150,6 +163,10 @@ public class BluetoothManager {
             Log.d(TAG,"Sending : "+cmd+" from "+id);
         } catch(IOException e) {
             e.printStackTrace();
+            if(e.toString().contains("Broken Pipe")) {
+                activity.disconnected();
+                isConnected = false;
+            }
         }
     }
 

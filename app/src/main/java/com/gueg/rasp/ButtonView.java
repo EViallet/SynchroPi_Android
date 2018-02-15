@@ -5,179 +5,127 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
+import android.os.Handler;
 import android.util.AttributeSet;
-import android.view.MotionEvent;
 import android.view.View;
 
-
-public class ButtonView extends View implements View.OnTouchListener {
+public class ButtonView extends ControlView implements View.OnClickListener {
 
     private Paint circlePaint = new Paint();
     private Paint outerCirclePaint = new Paint();
-    private Paint checkPaint = new Paint();
-    private Paint textPaint = new Paint();
+    private Paint wavePaint = new Paint();
 
-    private String title = "Switch";
-    private boolean showTitle = true;
-    private boolean switched = false;
-    private boolean allowClick = true;
-    private OnSwitch listener;
+    private static final float WAVE_MAX_RADIUS = 20;
+    private static final long WAVE_DURATION = 500;
+    private static final long WAVE_FRAMES = 60;
+    private Handler handler = new Handler();
+    private boolean drawWave = false;
+    private float radiusExtension;
 
     private float radius = -1f;
     private Point center;
-    private float[] check;
-    private float[] cross;
 
-    private int trueColor = Color.GREEN;
-    private int falseColor = Color.RED;
+    private OnAction listener;
+
+    private int circleColor = 0xffff9900;
+    private int outerCircleColor = 0xffff6600;
+    private int waveColor = 0xffcc3300;
+
 
     public ButtonView(Context context) {
         this(context, null);
     }
-
     public ButtonView(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
     }
-
     public ButtonView(Context context, AttributeSet attrs, int defStyleAttr) {
         this(context, attrs, defStyleAttr, 0);
     }
-
     public ButtonView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
 
-        outerCirclePaint.setColor(Color.BLACK);
-        checkPaint.setColor(Color.WHITE);
+        textPaint.setColor(Color.WHITE);
+        textPaint.setFakeBoldText(true);
 
-        textPaint.setColor(Color.BLACK);
-        textPaint.setTextAlign(Paint.Align.CENTER);
-
-        setOnTouchListener(this);
-    }
-
-    @Override
-    public boolean onTouch(View v, MotionEvent e) {
-        if(!allowClick)
-            return false;
-        switch (e.getAction()) {
-            case MotionEvent.ACTION_DOWN:
-                int relativeX = (int)e.getX() - center.x,
-                        relativeY = (int)e.getY() - center.y;
-
-                if(norme(relativeX,relativeY) <= radius) {
-                    switched = !switched;
-
-                    if (listener != null)
-                        listener.onSwitch(this, switched);
-                    invalidate();
-                    return true;
-                }
-                return false;
-            default:
-                return false;
-        }
+        setOnClickListener(this);
     }
 
     @Override
     public void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
+        circlePaint.setColor(circleColor);
+        outerCirclePaint.setColor(outerCircleColor);
+        wavePaint.setColor(waveColor);
+
         if(center==null)
             center = new Point(canvas.getWidth()/2, canvas.getHeight()/2);
 
         /* Drawing button */
         if(radius == -1f)
-            radius = (float)canvas.getWidth()/3f;
+            radius = canvas.getWidth()>canvas.getHeight()?(float)canvas.getHeight()/3f:(float)canvas.getWidth()/3f;
         canvas.drawCircle(center.x, center.y, (int)(radius*1.1), outerCirclePaint);
 
-        /* Drawing check mark */
-        if(checkPaint.getStrokeWidth()!=canvas.getWidth()/10)
-            checkPaint.setStrokeWidth(canvas.getWidth()/10);
-        if(switched) {
-            circlePaint.setColor(trueColor);
-            canvas.drawCircle(center.x, center.y, radius, circlePaint);
-            if(check==null)
-                check = new float[] {
-                        center.x+radius*3/7,
-                        center.y-radius*4/7,
-                        center.x-radius*1/7,
-                        center.y+radius*3/7,
-                        center.x,
-                        center.y+radius*2.75f/7,
-                        center.x-radius*4/7,
-                        center.y+radius*0.75f/7
-                };
-            canvas.drawLines(check, checkPaint);
-        } else {
-            circlePaint.setColor(falseColor);
-            canvas.drawCircle(center.x, center.y, radius, circlePaint);
-            if(cross==null)
-                cross = new float[] {
-                        center.x+radius*3/7,
-                        center.y+radius*3/7,
-                        center.x-radius*3/7,
-                        center.y-radius*3/7,
-                        center.x+radius*3/7,
-                        center.y-radius*3/7,
-                        center.x-radius*3/7,
-                        center.y+radius*3/7
-                };
-            canvas.drawLines(cross, checkPaint);
+        if(drawWave) {
+            radiusExtension++;
+            canvas.drawCircle(center.x, center.y, radius+ radiusExtension, wavePaint);
         }
+
+        canvas.drawCircle(center.x, center.y, radius, circlePaint);
 
         /* Drawing text */
         if(showTitle) {
-            if (textPaint.getTextSize() != canvas.getWidth() / 10)
-                textPaint.setTextSize(canvas.getWidth() / 10);
-            canvas.drawText(title, (float) canvas.getWidth() / 2f, (float) canvas.getHeight() - 20f, textPaint);
+            if (textPaint.getTextSize() != (canvas.getWidth()>canvas.getHeight()?(float)canvas.getHeight()/5f:(float)canvas.getWidth()/5f))
+                textPaint.setTextSize(canvas.getWidth()>canvas.getHeight()?(float)canvas.getHeight()/5f:(float)canvas.getWidth()/5f);
+            canvas.drawText(title, (float) canvas.getWidth() / 2f, (float) canvas.getHeight() /2f + textPaint.getTextSize()/3f, textPaint);
         }
+
+        if(drawWave&& radiusExtension >=WAVE_MAX_RADIUS) {
+            drawWave = false;
+            invalidate();
+        }
+        if(drawWave)
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    invalidate();
+                }
+            },WAVE_DURATION/WAVE_FRAMES);
     }
 
-    public void setTitle(String t) {
-        title = t;
+
+    @Override
+    public void onClick(View v) {
+        if(listener!=null)
+            listener.clicked();
+        handler.removeCallbacks(null);
+        radiusExtension = 0;
+        drawWave = true;
         invalidate();
     }
 
-    public void setShowTitle(boolean st) {
-        showTitle = st;
-    }
-
-    public void setSwitched(boolean b) {
-        switched = b;
-        invalidate();
-    }
-
-    public void setCheckedColor(int c) {
-        trueColor = c;
-    }
-
-    public void setUncheckedColor(int c) {
-        falseColor = c;
-    }
-
-    public void setAllowClick(boolean as) {
-        allowClick = as;
-    }
-
-    public boolean getSwitched() {
-        return switched;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setOnSwitchListener(OnSwitch listener) {
+    public void setActionlistener(OnAction listener) {
         this.listener = listener;
     }
 
-    private double norme(float x, float y) {
-        return Math.sqrt(Math.pow(x,2)+Math.pow(y,2));
+    public void setCircleColor(int c) {
+        circleColor = c;
+        invalidate();
     }
 
-    public interface OnSwitch {
-        void onSwitch(ButtonView v, boolean isEnabled);
+    public void setOuterCircleColor(int c) {
+        outerCircleColor = c;
+        invalidate();
     }
+
+    public void setWaveColor(int c) {
+        waveColor = c;
+        invalidate();
+    }
+
+    public interface OnAction {
+        void clicked();
+    }
+
 
 }
-

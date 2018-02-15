@@ -4,7 +4,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.gueg.rasp.MainActivity">
-
     <Button
         android:id="@+id/btn"
         android:layout_width="wrap_content"
@@ -13,29 +12,41 @@
         android:text="@string/text_connect"
 
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="20dp"/>
-
-    <EditText
-        android:id="@+id/send"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"/>
 
 
-        android:visibility="gone"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="20dp"
-        android:layout_below="@id/btn"/>
 
-    <TextView
-        android:id="@+id/txt"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+    <com.gueg.rasp.ButtonView
+        android:id="@+id/btn_shutdown"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
 
-        android:textColor="@android:color/black"
+        android:visibility="invisible"
 
-        android:visibility="gone"
-        android:layout_centerHorizontal="true"
-        android:layout_below="@id/send"/>
+        android:layout_marginTop="20dp"
+        android:layout_marginStart="20dp"/>
+
+    <com.gueg.rasp.ButtonView
+        android:id="@+id/btn_disconnect"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+
+        android:visibility="invisible"
+
+        android:layout_toEndOf="@id/btn_shutdown"
+        android:layout_marginTop="20dp"
+        android:layout_marginStart="20dp"/>
+
+    <com.gueg.rasp.SwitchView
+        android:id="@+id/switch_led"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+
+        android:visibility="invisible"
+
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="50dp"
+        android:layout_marginEnd="20dp"/>
 
     <com.gueg.rasp.MotorView
         android:id="@+id/controller_motor"
@@ -43,18 +54,39 @@
         android:layout_height="150dp"
 
         android:visibility="invisible"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"/>
-
-    <com.gueg.rasp.ButtonView
-        android:id="@+id/switch_motor"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-
+        android:layout_centerVertical="true"
+        android:layout_marginStart="20dp"/>
+    <com.gueg.rasp.MotorView
+        android:id="@+id/controller_motor2"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
 
         android:visibility="invisible"
-        android:layout_centerHorizontal="true"
-        android:layout_alignParentBottom="true"
-        android:layout_marginBottom="20dp"/>
+        android:layout_centerVertical="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="20dp"/>
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="20dp">
+        <com.gueg.rasp.SwitchView
+            android:id="@+id/switch_motor"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+
+
+            android:visibility="invisible"
+            android:layout_weight="1"/>
+        <com.gueg.rasp.SwitchView
+            android:id="@+id/switch_motor2"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+
+
+            android:visibility="invisible"
+            android:layout_weight="1"/>
+    </LinearLayout>
 </RelativeLayout>
