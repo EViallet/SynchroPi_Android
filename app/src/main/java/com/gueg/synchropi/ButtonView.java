@@ -1,4 +1,4 @@
-package com.gueg.rasp;
+package com.gueg.synchropi;
 
 import android.content.Context;
 import android.graphics.Canvas;

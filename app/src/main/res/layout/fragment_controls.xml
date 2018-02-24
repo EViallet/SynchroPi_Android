@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent">
+    <com.gueg.synchropi.ButtonView
+        android:id="@+id/btn_shutdown"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+
+        android:layout_marginTop="20dp"
+        android:layout_marginStart="20dp"/>
+
+    <com.gueg.synchropi.ButtonView
+        android:id="@+id/btn_disconnect"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+
+        android:layout_toEndOf="@id/btn_shutdown"
+        android:layout_marginTop="20dp"
+        android:layout_marginStart="20dp"/>
+
+    <com.gueg.synchropi.SwitchView
+        android:id="@+id/switch_led"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="50dp"
+        android:layout_marginEnd="20dp"/>
+
+    <com.gueg.synchropi.MotorView
+        android:id="@+id/controller_motor"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+
+        android:layout_centerVertical="true"
+        android:layout_marginStart="20dp"/>
+    <com.gueg.synchropi.MotorView
+        android:id="@+id/controller_motor2"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+
+        android:layout_centerVertical="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="20dp"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="20dp">
+        <com.gueg.synchropi.SwitchView
+            android:id="@+id/switch_motor"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+
+            android:layout_weight="1"/>
+        <com.gueg.synchropi.SwitchView
+            android:id="@+id/switch_motor2"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+
+            android:layout_weight="1"/>
+    </LinearLayout>
+</RelativeLayout>

@@ -3,4 +3,5 @@
     <color name="colorPrimary">#bf632d</color>
     <color name="colorPrimaryDark">#546e7a</color>
     <color name="colorAccent">#3a8936</color>
+    <color name="drawerBKG">#bdbdbd</color>
 </resources>

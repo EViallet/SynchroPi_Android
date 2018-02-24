@@ -1,6 +1,7 @@
 <resources>
-    <string name="app_name">Rasp</string>
+    <string name="app_name">SynchroPi</string>
     <string name="text_connect">Connexion</string>
+    <string name="text_device">Configuration</string>
     <string name="text_connected">Connecté!</string>
     <string name="text_disconnected">Déconnecté!</string>
     <string name="text_awaiting_connexion">En attente…</string>
