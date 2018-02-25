@@ -16,6 +16,7 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.util.Log;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.Toast;
@@ -132,8 +133,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void connected(int pos) {
         Toast.makeText(this, R.string.text_connected, Toast.LENGTH_SHORT).show();
-        bluetoothHandler.send(".");
-        fragmentManager.beginTransaction().replace(container.getId(), controls).setCustomAnimations(R.anim.enter,R.anim.exit).commit();
+        fragmentManager.beginTransaction().replace(container.getId(), controls).setCustomAnimations(R.anim.enter,R.anim.exit).commitAllowingStateLoss();
         macs.get(pos).BTconnected();
         macsAdapter.notifyDataSetChanged();
     }
@@ -149,19 +149,21 @@ public class MainActivity extends AppCompatActivity {
     public void disconnected() {
         Toast.makeText(this, R.string.text_disconnected, Toast.LENGTH_SHORT).show();
         bluetoothHandler = new BluetoothHandler(this);
-        fragmentManager.beginTransaction().replace(container.getId(), setup).setCustomAnimations(R.anim.enter,R.anim.exit).commit();
+        fragmentManager.beginTransaction().replace(container.getId(), setup).setCustomAnimations(R.anim.enter,R.anim.exit).commitAllowingStateLoss();
     }
 
     public ArrayList<Mac> getMacs() {
         return macs;
     }
 
-    public void macConnected(int ip, String m) {
+    public void macConnected(String m,int ip) {
+        Log.d("BTManager","Mac connected with mac "+m+" and ip "+ip);
         for(Mac mac : macs)
             if(mac.ad.equals(m)) {
                 mac.ip = ip;
                 mac.connected();
                 macsAdapter.notifyDataSetChanged();
+                Toast.makeText(this, Integer.toString(macs.size())+" appareils connectés", Toast.LENGTH_SHORT).show();
                 return;
             }
         macs.add(new Mac(m,true));
@@ -182,6 +184,7 @@ public class MainActivity extends AppCompatActivity {
             if(mac.ad.equals(m)) {
                 mac.disconnected();
                 macsAdapter.notifyDataSetChanged();
+                Toast.makeText(this, Integer.toString(macs.size())+" appareils connectés", Toast.LENGTH_SHORT).show();
                 return;
             }
         macs.add(new Mac(m,false));
@@ -211,8 +214,8 @@ public class MainActivity extends AppCompatActivity {
         if(!bluetoothHandler.isConnected())
             return;
 
-        if(cmd.equals("Disconnected")) {
-            bluetoothHandler.send("Disconnecting");
+        if(cmd.equals("Disconnecting")) {
+            bluetoothHandler.disconnect();
             disconnected();
         } else if(cmd.equals("Shutdown")) {
             bluetoothHandler.send("Shutdown");
@@ -317,7 +320,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        bluetoothHandler.send("Disconnecting");
     }
+
 
 }

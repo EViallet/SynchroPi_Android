@@ -17,7 +17,7 @@ public class SetupFragment extends Fragment {
 
     View root;
 
-    TextView txt_connecting;
+    LoadingView loading;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -29,20 +29,23 @@ public class SetupFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         root = inflater.inflate(R.layout.fragment_setup,container,false);
 
-        txt_connecting = root.findViewById(R.id.setup_connect);
+        loading = root.findViewById(R.id.setup_connect);
 
         return root;
     }
 
+    public void setLoadingMode(boolean infinite) {
+        loading.setLoadingMode(infinite);
+    }
+
     @SuppressLint("SetTextI18n")
     public void setIndex(final int current, final int max) {
-        txt_connecting.post(new Runnable() {
+        loading.postDelayed(new Runnable() {
             @Override
             public void run() {
-                int c = current+1;
-                txt_connecting.setText("Trying "+c+"/"+max);
+                loading.setCurrent(current+1,max);
             }
-        });
+        },500);
     }
 
     public void setActivity(MainActivity activity) {
