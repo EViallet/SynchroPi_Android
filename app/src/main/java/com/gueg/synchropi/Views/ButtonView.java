@@ -1,4 +1,4 @@
-package com.gueg.synchropi;
+package com.gueg.synchropi.Views;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -8,6 +8,8 @@ import android.graphics.Point;
 import android.os.Handler;
 import android.util.AttributeSet;
 import android.view.View;
+
+import java.util.ArrayList;
 
 public class ButtonView extends ControlView implements View.OnClickListener {
 
@@ -26,6 +28,7 @@ public class ButtonView extends ControlView implements View.OnClickListener {
     private Point center;
 
     private OnAction listener;
+    private String cmd;
 
     private int circleColor = 0xffff9900;
     private int outerCircleColor = 0xffff6600;
@@ -97,15 +100,21 @@ public class ButtonView extends ControlView implements View.OnClickListener {
     @Override
     public void onClick(View v) {
         if(listener!=null)
-            listener.clicked();
+            listener.clicked(this,cmd,macs);
         handler.removeCallbacks(null);
         radiusExtension = 0;
         drawWave = true;
         invalidate();
     }
 
-    public void setActionlistener(OnAction listener) {
+    public ButtonView setCommand(String cmd) {
+        this.cmd = cmd;
+        return this;
+    }
+
+    public ButtonView setActionlistener(OnAction listener) {
         this.listener = listener;
+        return this;
     }
 
     public void setCircleColor(int c) {
@@ -124,7 +133,7 @@ public class ButtonView extends ControlView implements View.OnClickListener {
     }
 
     public interface OnAction {
-        void clicked();
+        void clicked(ButtonView v, String cmd, ArrayList<Integer> macs);
     }
 
 

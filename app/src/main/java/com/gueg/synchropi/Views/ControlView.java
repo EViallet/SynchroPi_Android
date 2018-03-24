@@ -1,4 +1,4 @@
-package com.gueg.synchropi;
+package com.gueg.synchropi.Views;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -8,6 +8,8 @@ import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.View;
 
+import java.util.ArrayList;
+
 
 public class ControlView extends View {
 
@@ -16,6 +18,7 @@ public class ControlView extends View {
     protected String cmdId = "id";
     protected boolean showTitle = true;
     protected boolean allowClick = true;
+    protected ArrayList<Integer> macs = new ArrayList<>();
 
     public ControlView(Context context) {
         this(context, null);
@@ -24,6 +27,7 @@ public class ControlView extends View {
         this(context, attrs, 0);
     }
     public ControlView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+
         this(context, attrs, defStyleAttr, 0);
     }
     public ControlView(Context context, @Nullable AttributeSet attrs, int defStyleAttr, int defStyleRes) {
@@ -62,6 +66,21 @@ public class ControlView extends View {
 
     public String getTitle() {
         return title;
+    }
+
+    public ControlView attachMac(int m) {
+        macs.add(m);
+        return this;
+    }
+
+    public ArrayList<Integer> getAttachedMacs() {return macs;}
+
+    public void notifyMacDeleted(int pos) {
+        for(int i=0; i<macs.size(); i++)
+            if(macs.get(i)==pos) {
+                macs.remove(i);
+                break;
+            }
     }
 
 }

@@ -8,7 +8,8 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
+
+import com.gueg.synchropi.Views.LoadingView;
 
 
 public class SetupFragment extends Fragment {
@@ -40,12 +41,13 @@ public class SetupFragment extends Fragment {
 
     @SuppressLint("SetTextI18n")
     public void setIndex(final int current, final int max) {
-        loading.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                loading.setCurrent(current+1,max);
-            }
-        },500);
+        if(loading!=null)
+            loading.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    loading.setCurrent(current+1,max);
+                }
+            },500);
     }
 
     public void setActivity(MainActivity activity) {

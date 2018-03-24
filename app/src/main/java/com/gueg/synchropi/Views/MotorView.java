@@ -1,4 +1,4 @@
-package com.gueg.synchropi;
+package com.gueg.synchropi.Views;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -13,6 +13,8 @@ import android.graphics.SweepGradient;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
+
+import java.util.ArrayList;
 
 @SuppressWarnings("unused")
 @SuppressLint("DrawAllocation")
@@ -87,7 +89,7 @@ public class MotorView extends ControlView implements View.OnTouchListener {
                         value = 100 - (int)(((DEFAULT_ANGLE_R - normalizedAngle) / DEFAULT_ANGLE_R)*50);
 
                     if (listener != null)
-                        listener.onValueChanged(this,value);
+                        listener.onValueChanged(this,value,macs);
                 }
                 invalidate();
                 return true;
@@ -165,7 +167,7 @@ public class MotorView extends ControlView implements View.OnTouchListener {
     }
 
     public interface OnValueChanged {
-        void onValueChanged(MotorView v, int value);
+        void onValueChanged(MotorView v, int value, ArrayList<Integer> macs);
     }
 
 }

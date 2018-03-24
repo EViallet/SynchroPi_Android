@@ -16,7 +16,7 @@
         android:layout_centerVertical="true"/><
         -->
 
-    <com.gueg.synchropi.LoadingView
+    <com.gueg.synchropi.Views.LoadingView
         android:id="@+id/setup_connect"
         android:layout_width="250dp"
         android:layout_height="250dp"

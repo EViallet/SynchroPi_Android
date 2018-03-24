@@ -1,4 +1,4 @@
-package com.gueg.synchropi;
+package com.gueg.synchropi.Views;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -8,6 +8,8 @@ import android.graphics.Paint;
 import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.view.View;
+
+import com.gueg.synchropi.R;
 
 public class LoadingView extends View {
 
@@ -42,10 +44,10 @@ public class LoadingView extends View {
         super(context, attrs, defStyleAttr, defStyleRes);
 
         whitePaint.setColor(Color.WHITE);
-        //fullCirclePaint.setColor(Color.GREEN);
-        fullCirclePaint.setColor(0xff009900);
-        emptyCirclePaint.setColor(Color.GRAY);
-        waitingPaint.setColor(0xffef940b);
+        //fullCirclePaint.setColor(0xff009900);
+        fullCirclePaint.setColor(getResources().getColor(R.color.colorLoadingFull));
+        emptyCirclePaint.setColor(getResources().getColor(R.color.colorLoadingEmpty));
+        waitingPaint.setColor(getResources().getColor(R.color.colorLoadingFull));
     }
 
     @SuppressLint("DrawAllocation")

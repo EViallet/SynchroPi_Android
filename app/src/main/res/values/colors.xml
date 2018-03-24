@@ -1,7 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#bf632d</color>
+    <color name="colorPrimary">#26a69a</color>
     <color name="colorPrimaryDark">#546e7a</color>
     <color name="colorAccent">#3a8936</color>
     <color name="drawerBKG">#bdbdbd</color>
+
+    <color name="colorDialogHeaderAdd">#66bb6a</color>
+    <color name="colorDialogHeaderCancel">#ff6d00</color>
+    <color name="colorDialogHeaderRemove">#c62828</color>
+
+    <color name="colorLoadingFull">#7cb342</color>
+    <color name="colorLoadingEmpty">#bdbdbd</color>
 </resources>

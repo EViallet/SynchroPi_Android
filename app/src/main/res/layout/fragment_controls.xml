@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent" android:layout_height="match_parent">
-    <com.gueg.synchropi.ButtonView
+    <com.gueg.synchropi.Views.ButtonView
         android:id="@+id/btn_shutdown"
         android:layout_width="60dp"
         android:layout_height="60dp"
@@ -9,7 +9,7 @@
         android:layout_marginTop="20dp"
         android:layout_marginStart="20dp"/>
 
-    <com.gueg.synchropi.ButtonView
+    <com.gueg.synchropi.Views.ButtonView
         android:id="@+id/btn_disconnect"
         android:layout_width="60dp"
         android:layout_height="60dp"
@@ -18,8 +18,8 @@
         android:layout_marginTop="20dp"
         android:layout_marginStart="20dp"/>
 
-    <com.gueg.synchropi.SwitchView
-        android:id="@+id/switch_led"
+    <com.gueg.synchropi.Views.SwitchView
+        android:id="@+id/switch_shift_command"
         android:layout_width="100dp"
         android:layout_height="100dp"
 
@@ -27,14 +27,42 @@
         android:layout_marginTop="50dp"
         android:layout_marginEnd="20dp"/>
 
-    <com.gueg.synchropi.MotorView
-        android:id="@+id/controller_motor"
-        android:layout_width="150dp"
-        android:layout_height="150dp"
+    <com.gueg.synchropi.Views.ButtonView
+        android:id="@+id/button_circles"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
 
-        android:layout_centerVertical="true"
+        android:layout_marginTop="150dp"
         android:layout_marginStart="20dp"/>
-    <com.gueg.synchropi.MotorView
+    <com.gueg.synchropi.Views.ButtonView
+        android:id="@+id/button_fireworks"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+
+        android:layout_below="@id/button_circles"
+
+        android:layout_marginTop="20dp"
+        android:layout_marginStart="20dp"/>
+    <EditText
+        android:id="@+id/edittext_text"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+
+        android:layout_below="@id/button_fireworks"
+
+        android:layout_marginTop="30dp"
+        android:layout_marginStart="20dp"/>
+    <com.gueg.synchropi.Views.ButtonView
+        android:id="@+id/button_text"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+
+        android:layout_below="@id/button_fireworks"
+        android:layout_toEndOf="@id/edittext_text"
+
+        android:layout_marginTop="20dp"
+        android:layout_marginStart="20dp"/>
+    <com.gueg.synchropi.Views.MotorView
         android:id="@+id/controller_motor2"
         android:layout_width="150dp"
         android:layout_height="150dp"
@@ -43,23 +71,4 @@
         android:layout_alignParentEnd="true"
         android:layout_marginEnd="20dp"/>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="100dp"
-
-        android:layout_alignParentBottom="true"
-        android:layout_marginBottom="20dp">
-        <com.gueg.synchropi.SwitchView
-            android:id="@+id/switch_motor"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-
-            android:layout_weight="1"/>
-        <com.gueg.synchropi.SwitchView
-            android:id="@+id/switch_motor2"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-
-            android:layout_weight="1"/>
-    </LinearLayout>
 </RelativeLayout>

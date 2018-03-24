@@ -8,22 +8,33 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
+import android.widget.EditText;
+
+import com.gueg.synchropi.Views.ButtonView;
+import com.gueg.synchropi.Views.ControlView;
+import com.gueg.synchropi.Views.MotorView;
+import com.gueg.synchropi.Views.SwitchView;
+
+import java.util.ArrayList;
 
 
-public class ControlsFragment extends Fragment implements MotorView.OnValueChanged, SwitchView.OnSwitch {
+public class ControlsFragment extends Fragment implements MotorView.OnValueChanged, SwitchView.OnSwitch, ButtonView.OnAction {
 
     MainActivity activity;
 
     View root;
 
+    OnControlViewEvent onControlViewEventListener;
+
+    ArrayList<ControlView> views = new ArrayList<>();
     ButtonView btn_shutdown;
     ButtonView btn_disconnect;
-    MotorView motorController;
-    SwitchView motorSwitch;
+    ButtonView ledsCircle;
+    ButtonView ledsFireworks;
+    EditText ledsText;
+    ButtonView ledsTextSend;
     MotorView motorController2;
-    SwitchView motorSwitch2;
-    SwitchView ledSwitch;
+    SwitchView shiftSwitch; /**< Allows to enable or disable command shifting when a device becomes offline. */
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -35,52 +46,67 @@ public class ControlsFragment extends Fragment implements MotorView.OnValueChang
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         root = inflater.inflate(R.layout.fragment_controls,container,false);
         /* ControlViews */
-        motorController = root.findViewById(R.id.controller_motor);
-        motorController.setTitle("Moteur G").setCmdId("m_pwm");
-        motorController.setOnValueChangedListener(this);
-        motorSwitch = root.findViewById(R.id.switch_motor);
-        motorSwitch.setTitle("Moteur G").setCmdId("m_sw");
-        motorSwitch.setOnSwitchListener(this);
+        ledsCircle = root.findViewById(R.id.button_circles);
+        ledsCircle.setTitle("Cercles").setCmdId("leds");
+        ledsCircle.setActionlistener(this).setCommand("circle.py");
+        //ledsCircle.attachMac(0).attachMac(1);
+        ledsFireworks = root.findViewById(R.id.button_fireworks);
+        ledsFireworks.setTitle("Feux d'artifice").setCmdId("leds");
+        ledsFireworks.setActionlistener(this).setCommand("feux_artifice.py");
+        //ledsFireworks.attachMac(0).attachMac(1);
         motorController2 = root.findViewById(R.id.controller_motor2);
-        motorController2.setTitle("Moteur D").setCmdId("m_pwm2");
+        motorController2.setTitle("Couleur").setCmdId("leds_color");
         motorController2.setOnValueChangedListener(this);
-        motorSwitch2 = root.findViewById(R.id.switch_motor2);
-        motorSwitch2.setTitle("Moteur D").setCmdId("m_sw2");
-        motorSwitch2.setOnSwitchListener(this);
-        ledSwitch = root.findViewById(R.id.switch_led);
-        ledSwitch.setTitle("Led").setCmdId("l_sw");
-        ledSwitch.setOnSwitchListener(this);
-        ledSwitch.setCheckedColor(Color.CYAN).setUncheckedColor(Color.GRAY);
+        //motorController2.attachMac(0);
+        ledsText = root.findViewById(R.id.edittext_text);
+        ledsTextSend = root.findViewById(R.id.button_text);
+        ledsTextSend.setTitle("Envoyer").setCmdId("leds");
+        ledsTextSend.setActionlistener(new ButtonView.OnAction() {
+            @Override
+            public void clicked(ButtonView v, String cmd, ArrayList<Integer> macs) {
+                if(!ledsText.getText().toString().isEmpty())
+                    onControlViewEventListener.send(v.getCmdId(),"message.py "+ledsText.getText().toString()+" 139 89 25",macs);
+            }
+        });
+        shiftSwitch = root.findViewById(R.id.switch_shift_command);
+        shiftSwitch.setTitle("Décalage").setCmdId("cmd_shft");
+        shiftSwitch.setOnSwitchListener(this);
+        shiftSwitch.setCheckedColor(Color.CYAN).setUncheckedColor(Color.GRAY);
         /* btn_shutdown */
         btn_shutdown = root.findViewById(R.id.btn_shutdown);
         btn_shutdown.setTitle("OFF");
-        btn_shutdown.setActionlistener(new ButtonView.OnAction() {
-            @Override
-            public void clicked() {
-                activity.sendCommand("Shutdown");
-            }
-        });
+        btn_shutdown.setActionlistener(this).setCommand("sudo shutdown");
         /* btn_disconnect */
         btn_disconnect = root.findViewById(R.id.btn_disconnect);
         btn_disconnect.setTitle("DECO");
-        btn_disconnect.setActionlistener(new ButtonView.OnAction() {
-            @Override
-            public void clicked() {
-                activity.sendCommand("Disconnecting");
-            }
-        });
+        btn_disconnect.setActionlistener(this);
+
+        views.add(ledsCircle);
+        views.add(motorController2);
+        views.add(shiftSwitch);
         
         return root;
     }
 
-
-
-    public void onValueChanged(MotorView v, int value) {
-        activity.sendCommand(v.getCmdId(), value);
+    public void notifyMacDeleted(int pos) {
+        for(ControlView v : views)
+            v.notifyMacDeleted(pos);
     }
 
-    public void onSwitch(SwitchView v, boolean isSwitched) {
-        activity.sendCommand(v.getCmdId(), isSwitched);
+    public void onValueChanged(MotorView v, int value, ArrayList<Integer> macs) {
+        onControlViewEventListener.send(v.getCmdId(), value, macs);
+    }
+
+    public void onSwitch(SwitchView v, boolean isSwitched, ArrayList<Integer> macs) {
+        onControlViewEventListener.send(v.getCmdId(), isSwitched, macs);
+    }
+
+    public void clicked(ButtonView v, String cmd, ArrayList<Integer> macs) {
+        onControlViewEventListener.send(v.getCmdId(), cmd, macs);
+    }
+
+    public void setOnControlViewEventListener(OnControlViewEvent onControlViewEventListener) {
+        this.onControlViewEventListener = onControlViewEventListener;
     }
 
 

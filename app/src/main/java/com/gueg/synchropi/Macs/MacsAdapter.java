@@ -1,4 +1,4 @@
-package com.gueg.synchropi;
+package com.gueg.synchropi.Macs;
 
 
 import android.content.Context;
@@ -8,6 +8,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.gueg.synchropi.R;
 
 import java.util.ArrayList;
 
@@ -22,15 +24,17 @@ public class MacsAdapter extends RecyclerView.Adapter<MacsAdapter.ViewHolder>{
         ImageView connected;
         TextView mac;
         TextView ip;
+        TextView delay;
         ViewHolder(View v) {
             super(v);
             connected = v.findViewById(R.id.row_mac_enabled);
             mac = v.findViewById(R.id.row_mac_address);
             ip = v.findViewById(R.id.row_mac_ip);
+            delay = v.findViewById(R.id.row_mac_delay);
         }
     }
 
-    MacsAdapter(Context context, ArrayList<Mac> list) {
+    public MacsAdapter(Context context, ArrayList<Mac> list) {
         this.context = context;
         this.list = list;
     }
@@ -43,11 +47,18 @@ public class MacsAdapter extends RecyclerView.Adapter<MacsAdapter.ViewHolder>{
 
     @Override
     public void onBindViewHolder(final MacsAdapter.ViewHolder holder, final int position) {
-        holder.mac.setText(list.get(position).ad);
-        holder.ip.setText(new StringBuilder("150.150.150.").append(list.get(position).ip));
-        if(list.get(position).BTco)
+        Mac m = list.get(position);
+        holder.mac.setText(m.ad);
+        if(m.ip!=Mac.UNKNOWN_IP)
+            holder.ip.setText(new StringBuilder("150.150.150.").append(m.ip));
+        else
+            holder.ip.setText("IP inconnue");
+
+        holder.delay.setText(Integer.toString(m.delay)+" ms");
+
+        if(m.BTco)
             holder.connected.setImageDrawable(context.getResources().getDrawable(R.drawable.btconnected));
-        else if(list.get(position).co)
+        else if(m.co)
             holder.connected.setImageDrawable(context.getResources().getDrawable(R.drawable.connected));
         else
             holder.connected.setImageDrawable(context.getResources().getDrawable(R.drawable.disconnected));
@@ -57,7 +68,5 @@ public class MacsAdapter extends RecyclerView.Adapter<MacsAdapter.ViewHolder>{
     public int getItemCount() {
         return list.size();
     }
-
-
 
 }

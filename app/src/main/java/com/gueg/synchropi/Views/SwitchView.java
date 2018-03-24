@@ -1,4 +1,4 @@
-package com.gueg.synchropi;
+package com.gueg.synchropi.Views;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -8,6 +8,8 @@ import android.graphics.Point;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
+
+import java.util.ArrayList;
 
 
 public class SwitchView extends ControlView implements View.OnTouchListener {
@@ -61,7 +63,7 @@ public class SwitchView extends ControlView implements View.OnTouchListener {
                     switched = !switched;
 
                     if (listener != null)
-                        listener.onSwitch(this, switched);
+                        listener.onSwitch(this, switched, macs);
                     invalidate();
                     return true;
                 }
@@ -159,7 +161,7 @@ public class SwitchView extends ControlView implements View.OnTouchListener {
     }
 
     public interface OnSwitch {
-        void onSwitch(SwitchView v, boolean isEnabled);
+        void onSwitch(SwitchView v, boolean isEnabled, ArrayList<Integer> macs);
     }
 
 }

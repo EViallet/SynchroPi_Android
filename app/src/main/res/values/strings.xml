@@ -7,4 +7,6 @@
     <string name="text_awaiting_connexion">En attente…</string>
     <string name="text_shutdown">Eteindre</string>
     <string name="text_failed">Echec de la connexion</string>
+    <string name="text_hint_mac">Mac de l\'appareil</string>
+    <string name="text_hint_delay">Délai avant l\'éxécution des tâches</string>
 </resources>

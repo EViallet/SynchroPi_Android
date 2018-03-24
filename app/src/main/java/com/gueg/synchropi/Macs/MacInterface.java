@@ -1,4 +1,4 @@
-package com.gueg.synchropi;
+package com.gueg.synchropi.Macs;
 
 public interface MacInterface {
     void onMacAdded(Mac m);

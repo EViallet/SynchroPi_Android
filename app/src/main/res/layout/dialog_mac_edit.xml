@@ -1,46 +1,73 @@
 <?xml version="1.0" encoding="utf-8"?>
-<GridLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="300dp"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:weightSum="1">
+    android:orientation="vertical">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+
+        android:backgroundTint="@color/colorPrimary"
+
+        android:orientation="horizontal"
+        android:weightSum="6">
+        <View
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+
+            android:layout_weight="3"
+            android:background="@color/colorPrimary"
+            />
+        <ImageView
+            android:id="@+id/dialog_mac_edit_remove"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+
+            android:src="@drawable/ic_delete"
+            android:scaleType="center"
+            android:layout_weight="1"
+
+            android:background="@color/colorDialogHeaderRemove"/>
+        <ImageView
+            android:id="@+id/dialog_mac_edit_cancel"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+
+            android:src="@drawable/ic_cancel"
+            android:scaleType="center"
+            android:layout_weight="1"
+
+            android:background="@color/colorDialogHeaderCancel"/>
+        <ImageView
+            android:id="@+id/dialog_mac_edit_ok"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+
+            android:src="@drawable/ic_check"
+            android:scaleType="center"
+            android:layout_weight="1"
+
+            android:background="@color/colorDialogHeaderAdd"/>
+    </LinearLayout>
 
     <EditText
         android:id="@+id/dialog_mac_edit_mac"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
+
+        android:hint="@string/text_hint_mac"
         tools:ignore="LabelFor,TextFields" />
 
+    <EditText
+        android:id="@+id/dialog_mac_edit_delay"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:orientation="horizontal"
-        android:gravity="right"
-        tools:ignore="RtlHardcoded">
+        android:hint="@string/text_hint_delay"
+        android:inputType="number"
+        tools:ignore="LabelFor,TextFields" />
 
-        <Button
-            android:id="@+id/dialog_mac_edit_remove"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:visibility="gone"
-            android:text="Supprimer"
-            tools:ignore="ButtonStyle" />
-        <Button
-            android:id="@+id/dialog_mac_edit_annuler"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Annuler"
-            tools:ignore="ButtonStyle" />
-
-        <Button
-            android:id="@+id/dialog_mac_edit_valider"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Valider"
-            tools:ignore="ButtonStyle" />
-
-    </LinearLayout>
-</GridLayout>
+</LinearLayout>
