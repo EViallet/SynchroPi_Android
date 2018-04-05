@@ -9,4 +9,13 @@
     <string name="text_failed">Echec de la connexion</string>
     <string name="text_hint_mac">Mac de l\'appareil</string>
     <string name="text_hint_delay">Délai avant l\'éxécution des tâches</string>
+
+
+
+    <string name="servo_0">Aucun</string>
+    <string name="servo_1">0</string>
+    <string name="servo_2">1</string>
+    <string name="servo_3">2</string>
+    <string name="servo_4">3</string>
+
 </resources>

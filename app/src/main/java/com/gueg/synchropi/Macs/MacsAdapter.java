@@ -22,15 +22,15 @@ public class MacsAdapter extends RecyclerView.Adapter<MacsAdapter.ViewHolder>{
 
     static class ViewHolder extends RecyclerView.ViewHolder {
         ImageView connected;
+        ImageView selected;
         TextView mac;
         TextView ip;
-        TextView delay;
         ViewHolder(View v) {
             super(v);
+            selected = v.findViewById(R.id.row_mac_selected);
             connected = v.findViewById(R.id.row_mac_enabled);
             mac = v.findViewById(R.id.row_mac_address);
             ip = v.findViewById(R.id.row_mac_ip);
-            delay = v.findViewById(R.id.row_mac_delay);
         }
     }
 
@@ -54,7 +54,13 @@ public class MacsAdapter extends RecyclerView.Adapter<MacsAdapter.ViewHolder>{
         else
             holder.ip.setText("IP inconnue");
 
-        holder.delay.setText(Integer.toString(m.delay)+" ms");
+        if(m.isSelected) {
+            holder.selected.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_check));
+            holder.selected.setBackgroundColor(context.getResources().getColor(R.color.colorDialogHeaderAdd));
+        } else {
+            holder.selected.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_cancel));
+            holder.selected.setBackgroundColor(context.getResources().getColor(R.color.colorDialogHeaderRemove));
+        }
 
         if(m.BTco)
             holder.connected.setImageDrawable(context.getResources().getDrawable(R.drawable.btconnected));

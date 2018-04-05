@@ -8,23 +8,16 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.gueg.synchropi.Views.LoadingView;
 
-
-public class SetupFragment extends Fragment {
-
-    MainActivity activity;
+public class NetworkFragment extends Fragment {
 
     View root;
-
-    LoadingView loading;
+    MainActivity activity;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        root = inflater.inflate(R.layout.fragment_setup,container,false);
-
-        loading = root.findViewById(R.id.setup_connect);
+        root = inflater.inflate(R.layout.fragment_network, container, false);
 
         return root;
     }

@@ -60,14 +60,4 @@
         android:hint="@string/text_hint_mac"
         tools:ignore="LabelFor,TextFields" />
 
-    <EditText
-        android:id="@+id/dialog_mac_edit_delay"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-
-        android:hint="@string/text_hint_delay"
-        android:inputType="number"
-        tools:ignore="LabelFor,TextFields" />
-
 </LinearLayout>

@@ -21,7 +21,7 @@ import java.util.UUID;
  * Tries to connect to every mac currently loaded in MainActivity, then opens a socket to read/write from it at anytime.
  */
 @SuppressWarnings({"WeakerAccess", "ResultOfMethodCallIgnored"})
-public class BluetoothHandler extends Thread implements OnControlViewEvent {
+public class BluetoothHandler extends Thread implements OnEvent {
 
     private static final String TAG = "BTHandler"; /**<Debug tag*/
     private static final String PI_UUID = "00001111-0000-1000-8000-00805f9b34fb"; /**< Free uuid channel between the devices. */
@@ -35,7 +35,6 @@ public class BluetoothHandler extends Thread implements OnControlViewEvent {
     public static final String SEP_BOOL = "$";
     public static final String SEP_STR = "*";
     public static final String SEP_MAC = "^";
-    public static final String SEP_DELAY = "%";
     public static final String SEP_TASKID = "~";
 
     private BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter(); /**< Default android bluetooth adapter. */
@@ -68,51 +67,52 @@ public class BluetoothHandler extends Thread implements OnControlViewEvent {
                     }
                 }
                 // Check if there are any awaiting data.
-                try {
-                    int byteCount = in.available();
-                    if (byteCount > 0) {
-                        boolean valid = false;
-                        byte[] raw = new byte[byteCount];
-                        in.read(raw);
-                        final String string = new String(raw, "ASCII");
-                        String read = "";
-                        if (!isComplete(string)) {
-                            buffer.append(string);
-                            if (isComplete(buffer.toString())) {
-                                read = buffer.toString();
-                                valid = true;
-                                buffer.setLength(0);
-                            }
-                        } else {
-                            read = string;
-                            valid = true;
-                        }
-                        if (valid) {
-                            String cmds[] = read.split(SEP_PACKETS);
-                            for (int i = 1; i < cmds.length; i++) {
-                                final String cmd = cmds[i];
-                                if (!isCmdComplete(cmd)) {
-                                    buffer.append(cmd);
-                                    break;
+                if(isConnected)
+                    try {
+                        int byteCount = in.available();
+                        if (byteCount > 0) {
+                            boolean valid = false;
+                            byte[] raw = new byte[byteCount];
+                            in.read(raw);
+                            final String string = new String(raw, "ASCII");
+                            String read = "";
+                            if (!isComplete(string)) {
+                                buffer.append(string);
+                                if (isComplete(buffer.toString())) {
+                                    read = buffer.toString();
+                                    valid = true;
+                                    buffer.setLength(0);
                                 }
-                                Log.d(TAG, "Received : " + cmd);
-                                activity.runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        if (cmd.contains("M"))
-                                            activity.setBTIp(Integer.decode(cmd.replace(SEP_MAC, "").replace("M", "")));
-                                        else if (cmd.contains("C"))
-                                            activity.macConnected(cmd.replace(SEP_MAC, "").replace("C", "").substring(0, 17), Integer.decode(cmd.replace(SEP_MAC, "").replace("C", "").substring(17)));
-                                        else if (cmd.contains("D"))
-                                            activity.macDisconnected(cmd.replace(SEP_MAC, "").replace("C", ""));
+                            } else {
+                                read = string;
+                                valid = true;
+                            }
+                            if (valid) {
+                                String cmds[] = read.split(SEP_PACKETS);
+                                for (int i = 1; i < cmds.length; i++) {
+                                    final String cmd = cmds[i];
+                                    if (!isCmdComplete(cmd)) {
+                                        buffer.append(cmd);
+                                        break;
                                     }
-                                });
+                                    Log.d(TAG, "Received : " + cmd);
+                                    activity.runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            if (cmd.contains("PiMe"))
+                                                activity.setBTIp(Integer.decode(cmd.replace(SEP_MAC, "").replace("PiMe", "")));
+                                            else if (cmd.contains("PiCo"))
+                                                activity.macConnected(cmd.replace(SEP_MAC, "").replace("PiCo", "").substring(0, cmd.replace(SEP_MAC, "").replace("PiCo", "").length()-1), Integer.decode(cmd.replace(SEP_MAC, "").replace("PiCo", "").substring(cmd.replace(SEP_MAC, "").replace("PiCo", "").length()-1)));
+                                            else if (cmd.contains("PiDe"))
+                                                activity.macDisconnected(cmd.replace(SEP_MAC, "").replace("PiDe", ""));
+                                        }
+                                    });
+                                }
                             }
                         }
+                    } catch (IOException e) {
+                        e.printStackTrace();
                     }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
             } // if(isConnected())
         } // while(!interrupted())
         // On thread interrupted = on bluetooth turned off or on app close.
@@ -139,7 +139,7 @@ public class BluetoothHandler extends Thread implements OnControlViewEvent {
     }
 
     /**
-    * While getting incoming data, checks if the command contains at least one complete command.
+    * While parsing incoming data, checks if the command contains at least one complete command.
     @see count()
     @see run()
     */
@@ -173,7 +173,6 @@ public class BluetoothHandler extends Thread implements OnControlViewEvent {
     public void initBluetooth() {
         int currentIndex = 0;
         ArrayList<Mac> macs = activity.getMacs();
-        activity.currentIndex(currentIndex,macs.size());
         while(!isConnected&&currentIndex<macs.size()) {
             try {
                 BluetoothDevice device = bluetoothAdapter.getRemoteDevice(macs.get(currentIndex).ad);
@@ -193,12 +192,8 @@ public class BluetoothHandler extends Thread implements OnControlViewEvent {
                 Log.d(TAG,"Couldn't connect to "+macs.get(currentIndex).ad);
                 e.printStackTrace();
                 currentIndex++;
-                if(currentIndex<macs.size())
-                    activity.currentIndex(currentIndex,macs.size());
             }
         }
-        if(!isConnected)
-            activity.currentIndex(-1,macs.size());
     }
 
     /**
@@ -222,8 +217,6 @@ public class BluetoothHandler extends Thread implements OnControlViewEvent {
         } catch (IOException e) {
             Log.d(TAG,"Couldn't connect to "+mac+" - "+e.getCause());
         }
-        if(!isConnected)
-            activity.currentIndex(-1,-1);
     }
 
    /**
@@ -259,24 +252,23 @@ public class BluetoothHandler extends Thread implements OnControlViewEvent {
     }
 
 
-    // TODO redo check
     private String lastIntCmd = "";
     /**
     * Send an int command to out.
     * @param id Remote command target
     * @param cmd Command
     * @param target Targeted devices
-    * @see out
+    * @see out.0
     */
-   public void send(String id, int cmd, ArrayList<Integer> target) {
+   public void send(String id, int cmd) {
         if(!isConnected)
             return;
         try {
             StringBuilder str = new StringBuilder();
             str.append(SEP_PACKETS).append(SEP_TASKID).append(taskId).append(SEP_TASKID).append(SEP_ID).append(id).append(SEP_ID);
-            str.append(getTargets(target));
+            str.append(getTargets());
             str.append(SEP_INT).append(cmd).append(SEP_INT);
-            if(!str.toString().equals(lastIntCmd)) {
+            if(!str.toString().replace(Long.toString(taskId),"").equals(lastIntCmd.replace(Long.toString(taskId-1),""))) {
                 out.write(str.toString().getBytes());
                 lastIntCmd = str.toString();
                 Log.d(TAG, "Sending : " + str);
@@ -299,15 +291,15 @@ public class BluetoothHandler extends Thread implements OnControlViewEvent {
     * @param target Targeted devices
     * @see out
     */
-    public void send(String id, boolean cmd, ArrayList<Integer> target) {
+    public void send(String id, boolean cmd) {
         if(!isConnected)
             return;
         try {
             StringBuilder str = new StringBuilder();
             str.append(SEP_PACKETS).append(SEP_TASKID).append(taskId).append(SEP_TASKID).append(SEP_ID).append(id).append(SEP_ID);
-            str.append(getTargets(target));
+            str.append(getTargets());
             str.append(SEP_BOOL).append(Boolean.toString(cmd).charAt(0)).append(SEP_BOOL);
-            if(!str.toString().equals(lastBoolCmd)) {
+            if(!str.toString().replace(Long.toString(taskId),"").equals(lastBoolCmd.replace(Long.toString(taskId-1),""))) {
                 out.write(str.toString().getBytes());
                 Log.d(TAG, "Sending : " + str);
                 lastBoolCmd = str.toString();
@@ -322,7 +314,6 @@ public class BluetoothHandler extends Thread implements OnControlViewEvent {
         }
     }
 
-    private String lastStrCmd = "";
     /**
     * Send a String command to out.
     * @param id Remote command target
@@ -330,6 +321,33 @@ public class BluetoothHandler extends Thread implements OnControlViewEvent {
     * @param target Targeted devices
     * @see out
     */
+    public void send(String id, String cmd) {
+        if(!isConnected)
+            return;
+        try {
+            StringBuilder str = new StringBuilder();
+            str.append(SEP_PACKETS).append(SEP_TASKID).append(taskId).append(SEP_TASKID).append(SEP_ID).append(id).append(SEP_ID);
+            str.append(getTargets());
+            str.append(SEP_STR).append(cmd).append(SEP_STR);
+            out.write(str.toString().getBytes());
+            Log.d(TAG, "Sending : " + str);
+            taskId++;
+        } catch(IOException e) {
+            e.printStackTrace();
+            if(e.toString().contains("Broken pipe")) {
+                activity.disconnected();
+                isConnected = false;
+            }
+        }
+    }
+
+    /**
+     * Send a String command to out.
+     * @param id Remote command target
+     * @param cmd Command
+     * @param target Targeted devices
+     * @see out
+     */
     public void send(String id, String cmd, ArrayList<Integer> target) {
         if(!isConnected)
             return;
@@ -338,12 +356,9 @@ public class BluetoothHandler extends Thread implements OnControlViewEvent {
             str.append(SEP_PACKETS).append(SEP_TASKID).append(taskId).append(SEP_TASKID).append(SEP_ID).append(id).append(SEP_ID);
             str.append(getTargets(target));
             str.append(SEP_STR).append(cmd).append(SEP_STR);
-            if(!str.toString().equals(lastStrCmd)) {
-                out.write(str.toString().getBytes());
-                Log.d(TAG, "Sending : " + str);
-                lastStrCmd = str.toString();
-                taskId++;
-            }
+            out.write(str.toString().getBytes());
+            Log.d(TAG, "Sending : " + str);
+            taskId++;
         } catch(IOException e) {
             e.printStackTrace();
             if(e.toString().contains("Broken pipe")) {
@@ -358,12 +373,29 @@ public class BluetoothHandler extends Thread implements OnControlViewEvent {
     * @param arrayList View's targets
     * @return Device readable list.
     */
+    private String getTargets() {
+        StringBuilder str = new StringBuilder("");
+        ArrayList<Mac> macs = activity.getSelectedMacs();
+        if(macs==null)
+            return "";
+        for(int i=0; i<macs.size(); i++)
+            str.append(BluetoothHandler.SEP_MAC).append(macs.get(i).ip).append(BluetoothHandler.SEP_MAC);
+        return str.toString();
+    }
+
+    /**
+     * Formats targets to a device readable list.
+     * @param arrayList View's targets
+     * @return Device readable list.
+     */
     private String getTargets(ArrayList<Integer> arrayList) {
+        if(arrayList==null)
+            return "";
         StringBuilder str = new StringBuilder("");
         ArrayList<Mac> macs = activity.getMacs();
         for(int i=0; i<macs.size(); i++) {
-            if(arrayList.contains(i)&&macs.get(i).ip!=Mac.UNKNOWN_IP)
-                str.append(BluetoothHandler.SEP_MAC).append(macs.get(i).ip).append(BluetoothHandler.SEP_MAC).append(BluetoothHandler.SEP_DELAY).append(macs.get(i).delay).append(BluetoothHandler.SEP_DELAY);
+            if(arrayList.contains(macs.get(i).ip))
+                str.append(BluetoothHandler.SEP_MAC).append(macs.get(i).ip).append(BluetoothHandler.SEP_MAC);
         }
         return str.toString();
     }

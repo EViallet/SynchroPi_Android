@@ -8,10 +8,11 @@ import java.util.ArrayList;
  * @see ControlView
  * @see ControlsFragment
  */
-public interface OnControlViewEvent {
+public interface OnEvent {
     void disconnect();
     void send(String value);
-    void send(String id, int value, ArrayList<Integer> macs);
-    void send(String id, boolean value, ArrayList<Integer> macs);
+    void send(String id, int value);
+    void send(String id, boolean value);
+    void send(String id, String value);
     void send(String id, String value, ArrayList<Integer> macs);
 }

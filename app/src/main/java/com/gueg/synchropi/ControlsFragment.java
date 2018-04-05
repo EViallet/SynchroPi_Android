@@ -9,109 +9,136 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.RadioGroup;
+import android.widget.SeekBar;
+import android.widget.Switch;
 
-import com.gueg.synchropi.Views.ButtonView;
-import com.gueg.synchropi.Views.ControlView;
 import com.gueg.synchropi.Views.MotorView;
-import com.gueg.synchropi.Views.SwitchView;
-
-import java.util.ArrayList;
 
 
-public class ControlsFragment extends Fragment implements MotorView.OnValueChanged, SwitchView.OnSwitch, ButtonView.OnAction {
+public class ControlsFragment extends Fragment implements MotorView.OnValueChanged, View.OnClickListener, SeekBar.OnSeekBarChangeListener, RadioGroup.OnCheckedChangeListener {
 
     MainActivity activity;
 
     View root;
 
-    OnControlViewEvent onControlViewEventListener;
+    OnEvent onEventListener;
 
-    ArrayList<ControlView> views = new ArrayList<>();
-    ButtonView btn_shutdown;
-    ButtonView btn_disconnect;
-    ButtonView ledsCircle;
-    ButtonView ledsFireworks;
+    int _R = 0, _G = 0, _B = 0;
+    boolean debugMode = false;
+
     EditText ledsText;
-    ButtonView ledsTextSend;
-    MotorView motorController2;
-    SwitchView shiftSwitch; /**< Allows to enable or disable command shifting when a device becomes offline. */
 
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         root = inflater.inflate(R.layout.fragment_controls,container,false);
         /* ControlViews */
-        ledsCircle = root.findViewById(R.id.button_circles);
-        ledsCircle.setTitle("Cercles").setCmdId("leds");
-        ledsCircle.setActionlistener(this).setCommand("circle.py");
-        //ledsCircle.attachMac(0).attachMac(1);
-        ledsFireworks = root.findViewById(R.id.button_fireworks);
-        ledsFireworks.setTitle("Feux d'artifice").setCmdId("leds");
-        ledsFireworks.setActionlistener(this).setCommand("feux_artifice.py");
-        //ledsFireworks.attachMac(0).attachMac(1);
-        motorController2 = root.findViewById(R.id.controller_motor2);
-        motorController2.setTitle("Couleur").setCmdId("leds_color");
-        motorController2.setOnValueChangedListener(this);
-        //motorController2.attachMac(0);
-        ledsText = root.findViewById(R.id.edittext_text);
-        ledsTextSend = root.findViewById(R.id.button_text);
-        ledsTextSend.setTitle("Envoyer").setCmdId("leds");
-        ledsTextSend.setActionlistener(new ButtonView.OnAction() {
-            @Override
-            public void clicked(ButtonView v, String cmd, ArrayList<Integer> macs) {
-                if(!ledsText.getText().toString().isEmpty())
-                    onControlViewEventListener.send(v.getCmdId(),"message.py "+ledsText.getText().toString()+" 139 89 25",macs);
-            }
-        });
-        shiftSwitch = root.findViewById(R.id.switch_shift_command);
-        shiftSwitch.setTitle("Décalage").setCmdId("cmd_shft");
-        shiftSwitch.setOnSwitchListener(this);
-        shiftSwitch.setCheckedColor(Color.CYAN).setUncheckedColor(Color.GRAY);
-        /* btn_shutdown */
-        btn_shutdown = root.findViewById(R.id.btn_shutdown);
-        btn_shutdown.setTitle("OFF");
-        btn_shutdown.setActionlistener(this).setCommand("sudo shutdown");
-        /* btn_disconnect */
-        btn_disconnect = root.findViewById(R.id.btn_disconnect);
-        btn_disconnect.setTitle("DECO");
-        btn_disconnect.setActionlistener(this);
-
-        views.add(ledsCircle);
-        views.add(motorController2);
-        views.add(shiftSwitch);
+        root.findViewById(R.id.button_circles).setOnClickListener(this);
+        root.findViewById(R.id.button_fireworks).setOnClickListener(this);
         
+        ledsText = root.findViewById(R.id.edittext_text);
+        root.findViewById(R.id.button_text).setOnClickListener(this);
+        root.findViewById(R.id.switch_shift_command).setOnClickListener(this);
+        /* btn_disconnect */
+        root.findViewById(R.id.btn_disconnect).setOnClickListener(this);
+        /* btn_debug*/
+        root.findViewById(R.id.btn_debug).setOnClickListener(this);
+        /* RGB bars */
+        ((SeekBar)root.findViewById(R.id.seek_R)).setOnSeekBarChangeListener(this);
+        ((SeekBar)root.findViewById(R.id.seek_G)).setOnSeekBarChangeListener(this);
+        ((SeekBar)root.findViewById(R.id.seek_B)).setOnSeekBarChangeListener(this);
+        /* MotorViews */
+        ((MotorView)root.findViewById(R.id.servo_angle)).setOnValueChangedListener(this);
+        ((MotorView)root.findViewById(R.id.servo_angle)).setFullCircle(true);
+        ((MotorView)root.findViewById(R.id.servo_speed)).setOnValueChangedListener(this);
+        ((RadioGroup)root.findViewById(R.id.radio_group)).setOnCheckedChangeListener(this);
+
+
         return root;
     }
 
-    public void notifyMacDeleted(int pos) {
-        for(ControlView v : views)
-            v.notifyMacDeleted(pos);
+    // OnSeekBarChangeListener
+    @Override public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+        switch(seekBar.getId()) {
+            case R.id.seek_R:
+                _R = progress;
+                break;
+            case R.id.seek_G:
+                _G = progress;
+                break;
+            case R.id.seek_B:
+                _B = progress;
+                break;
+        }
+        root.findViewById(R.id.seek_helper).setBackgroundColor(Color.rgb(_R,_G,_B));
+    }
+    @Override public void onStartTrackingTouch(SeekBar seekBar) {}
+    @Override public void onStopTrackingTouch(SeekBar seekBar) {}
+
+    @Override
+    public void onCheckedChanged(RadioGroup group, int checkedId) {
+        String cmd = "";
+        switch(checkedId) {
+            case R.id.radio_stop:
+                cmd = "stop";
+                break;
+            case R.id.radio_cw:
+                cmd = "cw";
+                break;
+            case R.id.radio_ccw:
+                cmd = "ccw";
+                break;
+        }
+        onEventListener.send("servo", cmd);
     }
 
-    public void onValueChanged(MotorView v, int value, ArrayList<Integer> macs) {
-        onControlViewEventListener.send(v.getCmdId(), value, macs);
+    @Override
+    public void onValueChanged(MotorView v, int value) {
+        String cmdId = "";
+        switch(v.getId()) {
+            case R.id.servo_angle:
+                cmdId = "servo_a";
+                break;
+            case R.id.servo_speed:
+                cmdId = "servo_s";
+                break;
+        }
+        onEventListener.send(cmdId, value);
     }
 
-    public void onSwitch(SwitchView v, boolean isSwitched, ArrayList<Integer> macs) {
-        onControlViewEventListener.send(v.getCmdId(), isSwitched, macs);
+    public void setOnEventListener(OnEvent onEventListener) {
+        this.onEventListener = onEventListener;
     }
 
-    public void clicked(ButtonView v, String cmd, ArrayList<Integer> macs) {
-        onControlViewEventListener.send(v.getCmdId(), cmd, macs);
-    }
 
-    public void setOnControlViewEventListener(OnControlViewEvent onControlViewEventListener) {
-        this.onControlViewEventListener = onControlViewEventListener;
+    @Override
+    public void onClick(View v) {
+        int id = v.getId();
+        switch(id) {
+            case R.id.button_circles:
+                onEventListener.send("leds", "circle.py");
+                break;
+            case R.id.button_fireworks:
+                onEventListener.send("leds", "feux_artifice.py");
+                break;
+            case R.id.button_text:
+                onEventListener.send("leds", "message.py "+ledsText.getText().toString()+" "+Integer.toString(_R)+" "+Integer.toString(_G)+" "+Integer.toString(_B));
+                break;
+            case R.id.btn_disconnect:
+                break;
+            case R.id.btn_debug:
+                debugMode = !debugMode;
+                onEventListener.send("dbg", debugMode);
+                break;
+            case R.id.switch_shift_command:
+                onEventListener.send("cmd_shft", ((Switch)root.findViewById(id)).isChecked());
+                break;
+        }
     }
-
 
     public void setActivity(MainActivity activity) {
         this.activity = activity;
     }
-
 }

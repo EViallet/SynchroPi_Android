@@ -21,7 +21,6 @@ public class MacEditDialog extends BottomSheetDialogFragment {
     View rootView;
 
     EditText mac;
-    EditText delay;
 
     Mac m;
     boolean modif;
@@ -37,13 +36,8 @@ public class MacEditDialog extends BottomSheetDialogFragment {
         super.onCreateView(inflater, container, savedInstanceState);
 
         mac = rootView.findViewById(R.id.dialog_mac_edit_mac);
-        delay = rootView.findViewById(R.id.dialog_mac_edit_delay);
-        if(m!=null) {
+        if(m!=null)
             mac.setText(m.ad);
-            delay.setText(Integer.toString(m.delay));
-        } else {
-            delay.setText(Integer.toString(0));
-        }
 
         if(modif) {
             ImageView remove = rootView.findViewById(R.id.dialog_mac_edit_remove);
@@ -68,12 +62,10 @@ public class MacEditDialog extends BottomSheetDialogFragment {
             @Override
             public void onClick(View v) {
                 if(!mac.getText().toString().isEmpty()) {
-                    if(delay.getText().toString().isEmpty())
-                        delay.setText(0);
                     if(m==null)
-                        _listener.onMacAdded(new Mac(mac.getText().toString(),Integer.decode(delay.getText().toString())));
+                        _listener.onMacAdded(new Mac(mac.getText().toString()));
                     else
-                        _listener.onMacAdded(new Mac(mac.getText().toString(),m.ip,m.BTco,m.co,Integer.decode(delay.getText().toString())));
+                        _listener.onMacAdded(new Mac(mac.getText().toString(),m.ip,m.BTco,m.co));
                     dismiss();
                 } else
                     Toast.makeText(getActivity(), "Entrer un mac.", Toast.LENGTH_SHORT).show();

@@ -14,11 +14,9 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 
-import java.util.ArrayList;
-
 @SuppressWarnings("unused")
 @SuppressLint("DrawAllocation")
-public class MotorView extends ControlView implements View.OnTouchListener {
+public class MotorView extends View implements View.OnTouchListener {
 
     private Paint paint = new Paint();
     private Paint whitePaint = new Paint();
@@ -38,6 +36,8 @@ public class MotorView extends ControlView implements View.OnTouchListener {
 
     private int value = 0;
     private OnValueChanged listener;
+
+    private boolean fullCircle = false;
 
     private int colors[] = new int[] {0xff33cc33, 0xff99ff33, 0xffffff00, 0xffff9900, 0xffff0000, 0xffcc0000};
 
@@ -72,25 +72,25 @@ public class MotorView extends ControlView implements View.OnTouchListener {
                         relativeY = e.getY() - center.y;
                 angle = (float) Math.toDegrees(Math.atan2(relativeY, relativeX) + Math.PI / 2d);
 
-                if (angle >= DEFAULT_ANGLE_R && lastAngle >= 0 && lastAngle <= DEFAULT_ANGLE_R)
-                    angle = DEFAULT_ANGLE_R;
-                else if (angle >= 0 && angle <= 225 && lastAngle >= 225)
-                    angle = 225;
-                lastAngle = angle;
-
-                if (allowClick) {
-                    float normalizedAngle = angle;
-                    if (-90 <= angle && angle <= 0)
-                        normalizedAngle += MAX_ANGLE;
-
-                    if (normalizedAngle >= 225)
-                        value = Math.round(((normalizedAngle - DEFAULT_ANGLE_L) / DEFAULT_ANGLE_L)*100*50/60);
-                    else
-                        value = 100 - (int)(((DEFAULT_ANGLE_R - normalizedAngle) / DEFAULT_ANGLE_R)*50);
-
-                    if (listener != null)
-                        listener.onValueChanged(this,value,macs);
+                if(!fullCircle) {
+                    if (angle >= DEFAULT_ANGLE_R && lastAngle >= 0 && lastAngle <= DEFAULT_ANGLE_R)
+                        angle = DEFAULT_ANGLE_R;
+                    else if (angle >= 0 && angle <= 225 && lastAngle >= 225)
+                        angle = 225;
+                    lastAngle = angle;
                 }
+
+                float normalizedAngle = angle;
+                if (-90 <= angle && angle <= 0)
+                    normalizedAngle += MAX_ANGLE;
+
+                if (normalizedAngle >= 225)
+                    value = Math.round(((normalizedAngle - DEFAULT_ANGLE_L) / DEFAULT_ANGLE_L)*100*50/60);
+                else
+                    value = 100 - (int)(((DEFAULT_ANGLE_R - normalizedAngle) / DEFAULT_ANGLE_R)*50);
+
+                if (listener != null)
+                    listener.onValueChanged(this,value);
                 invalidate();
                 return true;
             default:
@@ -110,31 +110,23 @@ public class MotorView extends ControlView implements View.OnTouchListener {
         paint.setShader(new SweepGradient(canvas.getWidth()/2, canvas.getHeight()/2, colors, null));
 
         RectF rectf = new RectF(canvas.getClipBounds());
-        canvas.rotate(DEFAULT_ANGLE_R, (float)canvas.getWidth()/2f, (float)canvas.getHeight()/2f);
-        canvas.drawArc(rectf, 0, 2* DEFAULT_ANGLE_R, true, paint);
-        canvas.rotate(-DEFAULT_ANGLE_R, (float)canvas.getWidth()/2f, (float)canvas.getHeight()/2f);
+        if(!fullCircle) {
+            canvas.rotate(DEFAULT_ANGLE_R, (float) canvas.getWidth() / 2f, (float) canvas.getHeight() / 2f);
+            canvas.drawArc(rectf, 0, 2 * DEFAULT_ANGLE_R, true, paint);
+            canvas.rotate(-DEFAULT_ANGLE_R, (float) canvas.getWidth() / 2f, (float) canvas.getHeight() / 2f);
+        } else {
+            canvas.drawArc(rectf, 0, MAX_ANGLE, true, paint);
+        }
         if(circleRadius==-1f)
             circleRadius = (float)canvas.getWidth()/2f;
         canvas.drawCircle(circleRadius, (float)canvas.getHeight()/2f, (float)canvas.getHeight()/3f, whitePaint);
-
-        /* Drawing text */
-        if(showTitle) {
-            if (textPaint.getTextSize() != canvas.getWidth() / 10)
-                textPaint.setTextSize(canvas.getWidth() / 10);
-            canvas.drawText(title, (float) canvas.getWidth() / 2f, (float) canvas.getHeight() - 20f, textPaint);
-            textPaint.setFakeBoldText(true);
-            textPaint.setTextSize(80f);
-            canvas.drawText(Integer.toString(value), (float) canvas.getWidth() / 2f, (float) canvas.getHeight() * 3f / 4f, textPaint);
-            textPaint.setFakeBoldText(false);
-            textPaint.setTextSize(60f);
-        }
 
         /* Drawing triangle */
         if(triangleSize==-1f)
             triangleSize = (rectf.height()-circleRadius)/3f;
         triangle.reset();
-        triangle.lineTo(triangleSize       , 0);
-        triangle.lineTo(triangleSize/2     , triangleSize);
+        triangle.lineTo(triangleSize, 0);
+        triangle.lineTo(triangleSize/2, triangleSize);
         triangle.close();
 
         if(triangleOffset ==-1f)
@@ -160,6 +152,10 @@ public class MotorView extends ControlView implements View.OnTouchListener {
     }
 
 
+    public void setFullCircle(boolean fc) {
+        fullCircle = fc;
+        invalidate();
+    }
 
 
     public void setOnValueChangedListener(OnValueChanged listener) {
@@ -167,7 +163,7 @@ public class MotorView extends ControlView implements View.OnTouchListener {
     }
 
     public interface OnValueChanged {
-        void onValueChanged(MotorView v, int value, ArrayList<Integer> macs);
+        void onValueChanged(MotorView v, int value);
     }
 
 }

@@ -1,74 +1,207 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent" android:layout_height="match_parent">
-    <com.gueg.synchropi.Views.ButtonView
-        android:id="@+id/btn_shutdown"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
 
-        android:layout_marginTop="20dp"
-        android:layout_marginStart="20dp"/>
-
-    <com.gueg.synchropi.Views.ButtonView
+    <ImageButton
         android:id="@+id/btn_disconnect"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
 
-        android:layout_toEndOf="@id/btn_shutdown"
+        android:src="@drawable/ic_disconnect"
+        android:background="@null"
+
+        android:layout_marginTop="20dp"
+        android:layout_marginStart="20dp"/>
+    <ImageButton
+        android:id="@+id/btn_debug"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+
+        android:src="@drawable/ic_debug"
+        android:background="@null"
+
+        android:layout_toEndOf="@id/btn_disconnect"
         android:layout_marginTop="20dp"
         android:layout_marginStart="20dp"/>
 
-    <com.gueg.synchropi.Views.SwitchView
+    <Switch
         android:id="@+id/switch_shift_command"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        android:text="Décalage   "
 
         android:layout_alignParentEnd="true"
         android:layout_marginTop="50dp"
         android:layout_marginEnd="20dp"/>
 
-    <com.gueg.synchropi.Views.ButtonView
+    <Button
         android:id="@+id/button_circles"
-        android:layout_width="70dp"
-        android:layout_height="70dp"
-
-        android:layout_marginTop="150dp"
-        android:layout_marginStart="20dp"/>
-    <com.gueg.synchropi.Views.ButtonView
-        android:id="@+id/button_fireworks"
-        android:layout_width="70dp"
-        android:layout_height="70dp"
-
-        android:layout_below="@id/button_circles"
-
-        android:layout_marginTop="20dp"
-        android:layout_marginStart="20dp"/>
-    <EditText
-        android:id="@+id/edittext_text"
-        android:layout_width="100dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
 
-        android:layout_below="@id/button_fireworks"
+        android:text="Cercles"
+        android:backgroundTint="@color/colorPythonCircles"
+        android:textColor="@android:color/white"
 
-        android:layout_marginTop="30dp"
-        android:layout_marginStart="20dp"/>
-    <com.gueg.synchropi.Views.ButtonView
-        android:id="@+id/button_text"
-        android:layout_width="70dp"
-        android:layout_height="70dp"
-
-        android:layout_below="@id/button_fireworks"
-        android:layout_toEndOf="@id/edittext_text"
-
+        android:layout_below="@id/switch_shift_command"
         android:layout_marginTop="20dp"
-        android:layout_marginStart="20dp"/>
-    <com.gueg.synchropi.Views.MotorView
-        android:id="@+id/controller_motor2"
-        android:layout_width="150dp"
-        android:layout_height="150dp"
+        android:layout_marginStart="10dp"/>
+    <Button
+        android:id="@+id/button_fireworks"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
 
-        android:layout_centerVertical="true"
-        android:layout_alignParentEnd="true"
-        android:layout_marginEnd="20dp"/>
+        android:layout_below="@id/button_circles"
+        android:backgroundTint="@color/colorPythonFireworks"
+
+        android:text="Feux d'artifice"
+        android:textColor="@android:color/white"
+
+        android:layout_marginTop="10dp"
+        android:layout_marginStart="10dp"/>
+
+    <LinearLayout
+        android:id="@+id/layout_rgb"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_below="@id/button_fireworks"
+        android:layout_marginTop="20dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp">
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <SeekBar
+                android:id="@+id/seek_R"
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+
+                android:max="255"
+                android:layout_marginTop="10dp"/>
+            <SeekBar
+                android:id="@+id/seek_G"
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+
+                android:max="255"
+                android:layout_marginTop="10dp"/>
+            <SeekBar
+                android:id="@+id/seek_B"
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+
+                android:max="255"
+                android:layout_marginTop="10dp"/>
+        </LinearLayout>
+        <ImageView
+            android:id="@+id/seek_helper"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+
+            android:background="@android:color/black"
+            android:layout_marginStart="40dp"
+
+            android:layout_gravity="center_vertical"/>
+
+    </LinearLayout>
+
+    <com.gueg.synchropi.Views.MotorView
+        android:id="@+id/servo_angle"
+        android:layout_width="130dp"
+        android:layout_height="130dp"
+
+        android:layout_below="@id/layout_rgb"
+        android:layout_marginTop="15dp"
+        android:layout_marginStart="10dp"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        android:text="Angle"
+        android:textColor="@android:color/black"
+        android:textAlignment="center"
+
+        android:layout_below="@id/servo_angle"
+        android:layout_alignStart="@id/servo_angle"
+        android:layout_marginStart="50dp"
+        android:layout_marginTop="10dp"/>
+    <com.gueg.synchropi.Views.MotorView
+        android:id="@+id/servo_speed"
+        android:layout_width="130dp"
+        android:layout_height="130dp"
+
+        android:layout_below="@id/layout_rgb"
+        android:layout_marginTop="15dp"
+        android:layout_marginStart="15dp"
+        android:layout_toEndOf="@id/servo_angle"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        android:text="Vitesse"
+        android:textColor="@android:color/black"
+        android:textAlignment="center"
+
+        android:layout_below="@id/servo_speed"
+        android:layout_alignStart="@id/servo_speed"
+        android:layout_marginStart="45dp"
+        android:layout_marginTop="10dp"/>
+    <RadioGroup
+        android:id="@+id/radio_group"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        android:layout_below="@id/layout_rgb"
+        android:layout_toEndOf="@id/servo_speed"
+        android:layout_marginStart="15dp"
+        android:layout_marginTop="40dp">
+        <RadioButton
+            android:id="@+id/radio_stop"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:checked="true"/>
+        <RadioButton
+            android:id="@+id/radio_cw"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <RadioButton
+            android:id="@+id/radio_ccw"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </RadioGroup>
+
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp"
+        android:weightSum="4">
+        <EditText
+            android:id="@+id/edittext_text"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+
+            android:hint="Afficher..."
+            android:layout_weight="3"
+            />
+        <Button
+            android:id="@+id/button_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:text="Envoyer"
+            android:textColor="@android:color/white"
+            android:backgroundTint="@color/colorPythonText"
+
+            android:layout_marginStart="20dp"
+            android:layout_weight="1"/>
+    </LinearLayout>
 
 </RelativeLayout>

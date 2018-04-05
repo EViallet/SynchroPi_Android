@@ -43,20 +43,16 @@
             android:layout_centerVertical="true"
             />
 
-        <TextView
-            android:id="@+id/row_mac_delay"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+        <ImageView
+            android:id="@+id/row_mac_selected"
+            android:layout_width="35dp"
+            android:layout_height="match_parent"
 
-            android:textColor="@android:color/black"
-            android:text="0 ms"
-            android:textAlignment="center"
+            android:src="@drawable/ic_check"
+            android:scaleType="center"
+            android:background="@color/colorDialogHeaderAdd"
 
-            android:layout_toEndOf="@id/row_mac_address"
-            android:layout_below="@id/row_mac_ip"
-            android:layout_marginStart="10dp"
-            android:layout_centerVertical="true"
-            />
+            android:layout_alignParentEnd="true"/>
 
     </RelativeLayout>
 

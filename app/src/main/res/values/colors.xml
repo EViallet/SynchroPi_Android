@@ -11,4 +11,9 @@
 
     <color name="colorLoadingFull">#7cb342</color>
     <color name="colorLoadingEmpty">#bdbdbd</color>
+
+
+    <color name="colorPythonCircles">#7986cb</color>
+    <color name="colorPythonFireworks">#e57373</color>
+    <color name="colorPythonText">#9ccc65</color>
 </resources>

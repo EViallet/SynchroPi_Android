@@ -11,14 +11,14 @@ public class Mac {
     public int ip; /**< Device local ip address. */
     public boolean co; /**< Is currently connected in the ad-hoc network. */
     public boolean BTco = false; /**< Has an alive socket with Bluetoothhandler. */
-    public int delay; /**< Delay before executing tasks. */
+    public boolean isSelected = true;
 
     /**
      * Constructor.
      * @param a Mac address.
      */
     public Mac(String a) {
-        this(a,0);
+        this(a, false);
     }
 
     /**
@@ -27,16 +27,7 @@ public class Mac {
      * @param c Is currently connected?
      */
     public Mac(String a, boolean c) {
-        this(a, UNKNOWN_IP, false, c, 0);
-    }
-
-    /**
-     * Constructor.
-     * @param a Mac address.
-     * @param d Assigned delay.
-     */
-    public Mac(String a, int d) {
-        this(a, UNKNOWN_IP, false, false, d);
+        this(a, UNKNOWN_IP, false, c);
     }
 
     /**
@@ -45,15 +36,13 @@ public class Mac {
      * @param i Local ip.
      * @param bt Is currently connected with BluetoothHandler.
      * @param c Is currently alive in the ad-hoc network.
-     * @param d Assigned delay.
      */
-    public Mac(String a, int i, boolean bt, boolean c, int d) {
+    public Mac(String a, int i, boolean bt, boolean c) {
         ad = a;
         ip = i;
         BTco = bt;
         co = c;
         ip = i;
-        delay = d;
     }
 
     /**
@@ -82,6 +71,10 @@ public class Mac {
         co = false;
     }
 
+    public void toggle() {
+        isSelected = !isSelected;
+    }
+
     /**
      * Override to return a human readable String representing the Mac.
      * @return Readable Mac representation.
@@ -89,6 +82,6 @@ public class Mac {
     @Override
     public String toString() {
         //noinspection StringBufferReplaceableByString
-        return new StringBuilder().append(ad).append(" - ").append(ip).append(" - ").append(delay).toString();
+        return new StringBuilder().append(ad).append(" - ").append(ip).toString();
     }
 }

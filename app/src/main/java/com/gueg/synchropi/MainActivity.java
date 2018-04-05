@@ -9,7 +9,8 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.v4.app.FragmentManager;
+import android.support.v4.app.Fragment;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -17,7 +18,6 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.View;
-import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import com.gueg.synchropi.Macs.Mac;
@@ -38,16 +38,21 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String MACS_KEY = "com.gueg.synchropi.macs"; /**< Key recquired to load data from SharedPreferences. @see loadMacs() */
     private BluetoothHandler bluetoothHandler; /**< Bluetooth handling thread. */
-    private FragmentManager fragmentManager; /**< Allow to make Fragment transactions to update the UI smoothly. */
-    private FrameLayout container; /**< View to contains Fragments. */
+    private ViewPager pager;
+    private PagerAdapter pagerAdapter;
+    private NetworkFragment network;
+    private ServoFragment servo;
     private ControlsFragment controls; /**< Fragment containing and disposing ControlViews. @see ControlView */
     private SetupFragment setup; /**< Fragment containing a single LoadingView. @see LoadingView */
+    private ArrayList<Fragment> frags = new ArrayList<>();
     private ArrayList<Mac> macs = new ArrayList<>(); /**< Contains every stored and currently connected device's mac. */
     private RecyclerView macsRecyclerView; /**< Displays macs as a list in the drawer. @see macs */
     private MacsAdapter macsAdapter; /**< macsRecyclerView's adapter, needed to draw its rows. @see macsRecyclerView */
 
-    private static final String PI_MAC_1 = "B8:27:EB:F0:82:5B"; /**< Default mac, in case there are no saved instance in SharedPreferences. @see loadMacs() */
-    private static final String PI_MAC_2 = "B8:27:EB:40:00:FF"; /**< Another default mac. */
+    private static final String PI_MAC_0 = "B8:27:EB:F0:82:5B"; /**< Default mac, in case there are no saved instance in SharedPreferences. @see loadMacs() */
+    private static final String PI_MAC_1 = "B8:27:EB:EC:26:CF"; /**< Another default mac. */
+    private static final String PI_MAC_2 = "B8:27:EB:40:00:FF";
+    //private static final String PI_MAC_3 = "B8:27:EB:40:00:FF";
 
 
     /**
@@ -78,7 +83,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         // Parsing layout views
-        container = findViewById(R.id.fragment_container);
+        pager = findViewById(R.id.view_pager);
 
         // BluetoothHandler instantiation
         bluetoothHandler = new BluetoothHandler(this);
@@ -88,10 +93,20 @@ public class MainActivity extends AppCompatActivity {
         setup.setActivity(this);
         controls = new ControlsFragment();
         controls.setActivity(this);
-        controls.setOnControlViewEventListener(bluetoothHandler);
+        controls.setOnEventListener(bluetoothHandler);
+        network = new NetworkFragment();
+        network.setActivity(this);
+        servo = new ServoFragment();
+        servo.setActivity(this);
+        servo.setOnEventListener(bluetoothHandler);
 
-        fragmentManager = getSupportFragmentManager();
-        fragmentManager.beginTransaction().add(container.getId(), setup).commit();
+
+        frags.add(setup);
+
+        pagerAdapter = new PagerAdapter(getSupportFragmentManager(), frags);
+        pager.setAdapter(pagerAdapter);
+        pager.setPageTransformer(true, new ZoomOutPageTransformer());
+        pager.setOverScrollMode(View.OVER_SCROLL_NEVER);
 
         // Drawer - Bottom "Add" button
         findViewById(R.id.drawer_add).setOnClickListener(new View.OnClickListener() {
@@ -111,7 +126,7 @@ public class MainActivity extends AppCompatActivity {
                     @Override public void onCancel() {}
                     @Override public void onMacRemoved() {}
                 });
-                dialog.show(fragmentManager,"DIALOG");
+                dialog.show(getSupportFragmentManager(),"DIALOG");
             }
         });
 
@@ -127,11 +142,12 @@ public class MainActivity extends AppCompatActivity {
 
         // Loading macs from SharedPreferences
         if(loadMacs()==0) {
+            macs.add(new Mac(PI_MAC_0));
             macs.add(new Mac(PI_MAC_1));
             macs.add(new Mac(PI_MAC_2));
         }
 
-        // RecyclerView adapter
+        // RecyclerView pagerAdapter
         macsAdapter = new MacsAdapter(this,macs);
 
         macsRecyclerView.setAdapter(macsAdapter);
@@ -169,7 +185,8 @@ public class MainActivity extends AppCompatActivity {
 
                     @Override
                     public void onLongItemClick(View view, int position) {
-
+                        macs.get(position).toggle();
+                        macsAdapter.notifyDataSetChanged();
                     }
                 })
 
@@ -182,16 +199,6 @@ public class MainActivity extends AppCompatActivity {
             bluetoothHandler.start();
     }
 
-    /**
-     * Bridge between BluetoothHandler loading and LoadingView animation.
-     * @param c Current index
-     * @param m Max index
-     * @see BluetoothHandler
-     * @see LoadingView
-     */
-    public void currentIndex(int c, int m) {
-        setup.setIndex(c,m);
-    }
 
     /**
      * BluetoothHandler successfully connected to a device.
@@ -213,7 +220,12 @@ public class MainActivity extends AppCompatActivity {
      */
     public void connected(int pos) {
         Toast.makeText(this, R.string.text_connected, Toast.LENGTH_SHORT).show();
-        fragmentManager.beginTransaction().replace(container.getId(), controls).setCustomAnimations(R.anim.enter,R.anim.exit).commitAllowingStateLoss();
+        frags.clear();
+        frags.add(network);
+        frags.add(controls);
+        frags.add(servo);
+        pagerAdapter.notifyDataSetChanged();
+        pager.setCurrentItem(1);
         for(Mac m : macs)
             m.BTco = false;
         macs.get(pos).BTconnected();
@@ -226,7 +238,9 @@ public class MainActivity extends AppCompatActivity {
      */
     public void disconnected() {
         Toast.makeText(this, R.string.text_disconnected, Toast.LENGTH_SHORT).show();
-        fragmentManager.beginTransaction().replace(container.getId(), setup).setCustomAnimations(R.anim.enter,R.anim.exit).commitAllowingStateLoss();
+        frags.clear();
+        frags.add(setup);
+        pagerAdapter.notifyDataSetChanged();
     }
 
     /**
@@ -235,6 +249,21 @@ public class MainActivity extends AppCompatActivity {
      */
     public ArrayList<Mac> getMacs() {
         return macs;
+    }
+
+    // TODO standby? shift?
+    public ArrayList<Mac> getSelectedMacs() {
+        ArrayList<Mac> selected = new ArrayList<>();
+        int selectedCount = 0;
+        for (Mac m : macs)
+            if (m.isSelected) {
+                selectedCount++;
+                if (m.ip != -1)
+                    selected.add(m);
+            }
+        if(selectedCount==macs.size())
+            return null;
+        return selected;
     }
 
     /**
@@ -249,27 +278,38 @@ public class MainActivity extends AppCompatActivity {
                 mac.ip = ip;
                 mac.connected();
                 macsAdapter.notifyDataSetChanged();
-                Toast.makeText(this, Integer.toString(macs.size())+" appareils connectés", Toast.LENGTH_SHORT).show();
+                int co = 0;
+                for(Mac ma : macs)
+                    if(ma.co||ma.BTco)
+                        co++;
+                Toast.makeText(this, Integer.toString(co)+" appareils connectés", Toast.LENGTH_SHORT).show();
                 return;
             }
         macs.add(new Mac(m,true));
         macsAdapter.notifyDataSetChanged();
+        int co = 0;
+        for(Mac ma : macs)
+            if(ma.co)
+                co++;
+        Toast.makeText(this, Integer.toString(co)+" appareils connectés", Toast.LENGTH_SHORT).show();
     }
 
     /**
      * Another lan device was disconnected from the currently connected device.
      * @param m Its bluetooth mac address.
      */
-    public void macDisconnected(String m) {
+    public void macDisconnected(String ip) {
         for(Mac mac : macs)
-            if(mac.ad.equals(m)) {
+            if(mac.ip==Integer.decode(ip)) {
                 mac.disconnected();
                 macsAdapter.notifyDataSetChanged();
-                Toast.makeText(this, Integer.toString(macs.size())+" appareils connectés", Toast.LENGTH_SHORT).show();
+                int co = 0;
+                for(Mac ma : macs)
+                    if(ma.co||ma.BTco)
+                        co++;
+                Toast.makeText(this, Integer.toString(co)+" appareils connectés", Toast.LENGTH_SHORT).show();
                 return;
             }
-        macs.add(new Mac(m,false));
-        macsAdapter.notifyDataSetChanged();
     }
 
     /**
@@ -311,7 +351,7 @@ public class MainActivity extends AppCompatActivity {
                 macsAdapter.notifyDataSetChanged();
             }
         });
-        dialog.show(fragmentManager,"DIALOG");
+        dialog.show(getSupportFragmentManager(),"DIALOG");
     }
 
     /**
@@ -331,7 +371,6 @@ public class MainActivity extends AppCompatActivity {
                             macsRecyclerView.removeViewAt(position);
                             macsAdapter.notifyItemRemoved(position);
                             macsAdapter.notifyItemRangeChanged(position, macs.size());
-                            controls.notifyMacDeleted(position);
                             saveMacs();
                             break;
 
