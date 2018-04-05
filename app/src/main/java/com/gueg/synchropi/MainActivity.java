@@ -435,5 +435,4 @@ public class MainActivity extends AppCompatActivity {
         bluetoothHandler.interrupt();
     }
 
-
 }

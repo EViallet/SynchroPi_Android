@@ -141,4 +141,5 @@ public class ControlsFragment extends Fragment implements MotorView.OnValueChang
     public void setActivity(MainActivity activity) {
         this.activity = activity;
     }
+
 }

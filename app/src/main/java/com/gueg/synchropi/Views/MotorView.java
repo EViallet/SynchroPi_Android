@@ -20,6 +20,7 @@ public class MotorView extends View implements View.OnTouchListener {
 
     private Paint paint = new Paint();
     private Paint whitePaint = new Paint();
+    private Paint textPaint = new Paint();
 
     private Path triangle = new Path();
     private Paint trianglePaint = new Paint();
@@ -39,7 +40,16 @@ public class MotorView extends View implements View.OnTouchListener {
 
     private boolean fullCircle = false;
 
-    private int colors[] = new int[] {0xff33cc33, 0xff99ff33, 0xffffff00, 0xffff9900, 0xffff0000, 0xffcc0000};
+    //private int colors[] = new int[] {0xff33cc33, 0xff99ff33, 0xffffff00, 0xffff9900, 0xffff0000, 0xffcc0000};
+    //private int colors[] = new int[] {0xffe0e0e0, 0xffbdbdbd, 0xff9e9e9e, 0xff757575, 0xff616161, 0xff424242
+    //  ,0xff616161, 0xff757575, 0xff9e9e9e, 0xffbdbdbd,0xffe0e0e0};
+    private int colors[] = new int[]{0xffbdbdbd,  0xff546e7a, 0xff0d597c, 0xff546e7a, 0xffbdbdbd};
+    private int colors2[] = new int[]{
+            0xffbdbdbd,  0xff546e7a, 0xff0d597c, 0xff546e7a, 0xffbdbdbd,
+            0xffbdbdbd,  0xff546e7a, 0xff0d597c, 0xff546e7a, 0xffbdbdbd,
+            0xffbdbdbd,  0xff546e7a, 0xff0d597c, 0xff546e7a, 0xffbdbdbd,
+            0xffbdbdbd,  0xff546e7a, 0xff0d597c, 0xff546e7a, 0xffbdbdbd
+    };
 
     public MotorView(Context context) {
         this(context, null);
@@ -53,11 +63,15 @@ public class MotorView extends View implements View.OnTouchListener {
     public MotorView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
 
-        whitePaint.setColor(Color.WHITE);
+        whitePaint.setColor(0xFFFAFAFA);
 
         triangle.setFillType(Path.FillType.EVEN_ODD);
-        trianglePaint.setColor(Color.GRAY);
+        trianglePaint.setColor(0xff3a8936);
         trianglePaint.setStyle(Paint.Style.FILL);
+
+        textPaint.setColor(Color.BLACK);
+        textPaint.setTextAlign(Paint.Align.CENTER);
+        textPaint.setTextSize(40f);
 
         setOnTouchListener(this);
     }
@@ -78,16 +92,23 @@ public class MotorView extends View implements View.OnTouchListener {
                     else if (angle >= 0 && angle <= 225 && lastAngle >= 225)
                         angle = 225;
                     lastAngle = angle;
+
+                    float normalizedAngle = angle;
+                    if (-90 <= angle && angle <= 0)
+                        normalizedAngle += MAX_ANGLE;
+
+                    if (normalizedAngle >= 225)
+                        value = Math.round(((normalizedAngle - DEFAULT_ANGLE_L) / DEFAULT_ANGLE_L)*100*50/60);
+                    else
+                        value = 100 - (int)(((DEFAULT_ANGLE_R - normalizedAngle) / DEFAULT_ANGLE_R)*50);
+                } else {
+                    float normalizedAngle = angle;
+                    if (-90 <= angle && angle <= 0)
+                        normalizedAngle += MAX_ANGLE;
+
+                    value = (int)normalizedAngle;
+
                 }
-
-                float normalizedAngle = angle;
-                if (-90 <= angle && angle <= 0)
-                    normalizedAngle += MAX_ANGLE;
-
-                if (normalizedAngle >= 225)
-                    value = Math.round(((normalizedAngle - DEFAULT_ANGLE_L) / DEFAULT_ANGLE_L)*100*50/60);
-                else
-                    value = 100 - (int)(((DEFAULT_ANGLE_R - normalizedAngle) / DEFAULT_ANGLE_R)*50);
 
                 if (listener != null)
                     listener.onValueChanged(this,value);
@@ -107,7 +128,10 @@ public class MotorView extends View implements View.OnTouchListener {
             center = new Point(canvas.getWidth()/2, canvas.getHeight()/2);
 
         /* Drawing gradient arc */
-        paint.setShader(new SweepGradient(canvas.getWidth()/2, canvas.getHeight()/2, colors, null));
+        if(!fullCircle)
+            paint.setShader(new SweepGradient(canvas.getWidth()/2, canvas.getHeight()/2, colors, null));
+        else
+            paint.setShader(new SweepGradient(canvas.getWidth()/2, canvas.getHeight()/2, colors2, null));
 
         RectF rectf = new RectF(canvas.getClipBounds());
         if(!fullCircle) {
@@ -139,6 +163,11 @@ public class MotorView extends View implements View.OnTouchListener {
         triangle.transform(rotationMatrix);
 
         canvas.drawPath(triangle, trianglePaint);
+
+        if(fullCircle)
+            canvas.drawText(Integer.toString(value)+"°", center.x, center.y, textPaint);
+        else
+            canvas.drawText(Integer.toString(value)+"%", center.x, center.y, textPaint);
     }
 
 
@@ -154,6 +183,7 @@ public class MotorView extends View implements View.OnTouchListener {
 
     public void setFullCircle(boolean fc) {
         fullCircle = fc;
+        angle = 0;
         invalidate();
     }
 
