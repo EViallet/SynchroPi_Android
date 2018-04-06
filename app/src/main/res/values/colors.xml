@@ -14,6 +14,8 @@
 
 
     <color name="colorPythonCircles">#7986cb</color>
+    <color name="colorPythonRainbow">#cfc354</color>
+    <color name="colorPythonSquare">#d08ada</color>
     <color name="colorPythonFireworks">#e57373</color>
     <color name="colorPythonText">#9ccc65</color>
 

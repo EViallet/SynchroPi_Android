@@ -11,11 +11,12 @@
     <string name="text_hint_delay">Délai avant l\'éxécution des tâches</string>
 
 
-
-    <string name="servo_0">Aucun</string>
-    <string name="servo_1">0</string>
-    <string name="servo_2">1</string>
-    <string name="servo_3">2</string>
-    <string name="servo_4">3</string>
+    <string-array name="spinner_servo_array">
+        <item>Aucun</item>
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+    </string-array>
 
 </resources>

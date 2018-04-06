@@ -48,6 +48,19 @@
         android:layout_marginTop="20dp"
         android:layout_marginStart="10dp"/>
     <Button
+        android:id="@+id/button_rainbow"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        android:text="Rainbow"
+        android:backgroundTint="@color/colorPythonRainbow"
+        android:textColor="@android:color/white"
+
+        android:layout_below="@id/switch_shift_command"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="15dp"
+        android:layout_alignParentEnd="true"/>
+    <Button
         android:id="@+id/button_fireworks"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -60,6 +73,21 @@
 
         android:layout_marginTop="10dp"
         android:layout_marginStart="10dp"/>
+    <Button
+        android:id="@+id/button_square"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        android:layout_below="@id/button_circles"
+        android:backgroundTint="@color/colorPythonSquare"
+
+        android:text="Carrés"
+        android:textColor="@android:color/white"
+
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="15dp"
+
+        android:layout_alignParentEnd="true"/>
 
     <LinearLayout
         android:id="@+id/layout_rgb"
@@ -80,6 +108,7 @@
                 android:layout_height="wrap_content"
 
                 android:max="255"
+                android:progress="88"
                 android:layout_marginTop="10dp"/>
             <SeekBar
                 android:id="@+id/seek_G"
@@ -87,6 +116,7 @@
                 android:layout_height="wrap_content"
 
                 android:max="255"
+                android:progress="226"
                 android:layout_marginTop="10dp"/>
             <SeekBar
                 android:id="@+id/seek_B"
@@ -94,6 +124,7 @@
                 android:layout_height="wrap_content"
 
                 android:max="255"
+                android:progress="120"
                 android:layout_marginTop="10dp"/>
         </LinearLayout>
         <ImageView
@@ -101,21 +132,88 @@
             android:layout_width="50dp"
             android:layout_height="50dp"
 
-            android:background="@android:color/black"
+            android:background="#FF58e278"
             android:layout_marginStart="40dp"
 
             android:layout_gravity="center_vertical"/>
 
     </LinearLayout>
 
+
+    <RadioGroup
+        android:id="@+id/radio_group"
+        android:layout_width="wrap_content"
+        android:layout_height="130dp"
+
+        android:layout_below="@id/layout_rgb"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="15dp"
+        android:layout_marginEnd="5dp"
+        android:weightSum="3">
+        <RadioButton
+            android:id="@+id/radio_stop"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:checked="true"
+
+            android:layout_weight="1"/>
+        <RadioButton
+            android:id="@+id/radio_cw"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:layout_weight="1"/>
+        <RadioButton
+            android:id="@+id/radio_ccw"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:layout_weight="1"/>
+    </RadioGroup>
+    <LinearLayout
+        android:id="@+id/radio_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        android:orientation="vertical"
+        android:layout_toEndOf="@id/radio_group"
+        android:layout_alignTop="@id/radio_group"
+        android:layout_alignBottom="@id/radio_group"
+
+        android:weightSum="3"
+        android:layout_marginEnd="5dp">
+        <ImageView
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+
+            android:src="@drawable/ic_stop"
+
+            android:layout_weight="1"/>
+        <ImageView
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+
+            android:src="@drawable/ic_cw"
+
+            android:layout_weight="1"/>
+        <ImageView
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+
+            android:src="@drawable/ic_ccw"
+
+            android:layout_weight="1"/>
+    </LinearLayout>
     <com.gueg.synchropi.Views.MotorView
         android:id="@+id/servo_angle"
         android:layout_width="130dp"
         android:layout_height="130dp"
 
         android:layout_below="@id/layout_rgb"
+        android:layout_toEndOf="@id/radio_text"
         android:layout_marginTop="15dp"
-        android:layout_marginStart="10dp"/>
+        android:layout_marginStart="5dp"/>
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -135,7 +233,7 @@
 
         android:layout_below="@id/layout_rgb"
         android:layout_marginTop="15dp"
-        android:layout_marginStart="15dp"
+        android:layout_marginStart="05dp"
         android:layout_toEndOf="@id/servo_angle"/>
     <TextView
         android:layout_width="wrap_content"
@@ -149,30 +247,6 @@
         android:layout_alignStart="@id/servo_speed"
         android:layout_marginStart="45dp"
         android:layout_marginTop="10dp"/>
-    <RadioGroup
-        android:id="@+id/radio_group"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-
-        android:layout_below="@id/layout_rgb"
-        android:layout_toEndOf="@id/servo_speed"
-        android:layout_marginStart="15dp"
-        android:layout_marginTop="40dp">
-        <RadioButton
-            android:id="@+id/radio_stop"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-
-            android:checked="true"/>
-        <RadioButton
-            android:id="@+id/radio_cw"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-        <RadioButton
-            android:id="@+id/radio_ccw"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-    </RadioGroup>
 
 
 

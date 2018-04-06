@@ -9,14 +9,15 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
-import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Toast;
 
@@ -38,7 +39,8 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String MACS_KEY = "com.gueg.synchropi.macs"; /**< Key recquired to load data from SharedPreferences. @see loadMacs() */
     private BluetoothHandler bluetoothHandler; /**< Bluetooth handling thread. */
-    private ViewPager pager;
+    private NonSwipeableViewPager pager;
+    private TabLayout tabs;
     private PagerAdapter pagerAdapter;
     private NetworkFragment network;
     private ServoFragment servo;
@@ -83,7 +85,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         // Parsing layout views
-        pager = findViewById(R.id.view_pager);
+        pager = findViewById(R.id.pager);
+        tabs = findViewById(R.id.tab_layout);
 
         // BluetoothHandler instantiation
         bluetoothHandler = new BluetoothHandler(this);
@@ -103,10 +106,30 @@ public class MainActivity extends AppCompatActivity {
 
         frags.add(setup);
 
+        pager.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                return true;
+            }
+        });
+        tabs.addTab(tabs.newTab().setText("Réseau"));
+        tabs.addTab(tabs.newTab().setText("Contrôle"));
+        tabs.addTab(tabs.newTab().setText("Servos"));
+        tabs.setTabGravity(TabLayout.GRAVITY_FILL);
         pagerAdapter = new PagerAdapter(getSupportFragmentManager(), frags);
         pager.setAdapter(pagerAdapter);
         pager.setPageTransformer(true, new ZoomOutPageTransformer());
         pager.setOverScrollMode(View.OVER_SCROLL_NEVER);
+
+        pager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabs));
+        tabs.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                pager.setCurrentItem(tab.getPosition());
+            }
+            @Override public void onTabUnselected(TabLayout.Tab tab) {}
+            @Override public void onTabReselected(TabLayout.Tab tab) {}
+        });
 
         // Drawer - Bottom "Add" button
         findViewById(R.id.drawer_add).setOnClickListener(new View.OnClickListener() {
@@ -225,7 +248,13 @@ public class MainActivity extends AppCompatActivity {
         frags.add(controls);
         frags.add(servo);
         pagerAdapter.notifyDataSetChanged();
-        pager.setCurrentItem(1);
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                tabs.setVisibility(View.VISIBLE);
+                pager.setCurrentItem(1);
+            }
+        });
         for(Mac m : macs)
             m.BTco = false;
         macs.get(pos).BTconnected();
@@ -240,6 +269,12 @@ public class MainActivity extends AppCompatActivity {
         Toast.makeText(this, R.string.text_disconnected, Toast.LENGTH_SHORT).show();
         frags.clear();
         frags.add(setup);
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                tabs.setVisibility(View.GONE);
+            }
+        });
         pagerAdapter.notifyDataSetChanged();
     }
 

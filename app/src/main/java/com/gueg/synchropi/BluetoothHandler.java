@@ -35,7 +35,6 @@ public class BluetoothHandler extends Thread implements OnEvent {
     public static final String SEP_BOOL = "$";
     public static final String SEP_STR = "*";
     public static final String SEP_MAC = "^";
-    public static final String SEP_TASKID = "~";
 
     private BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter(); /**< Default android bluetooth adapter. */
     private BluetoothSocket socket; /**< Will try to connect to any open QBluetoothServer on channel PI_UUID @see PI_UUID @see initBluetooth() */
@@ -43,8 +42,7 @@ public class BluetoothHandler extends Thread implements OnEvent {
     private InputStream in; /**< Allows to read from socket */
     private OutputStream out; /**< Allows to write to socket */
     private StringBuilder buffer = new StringBuilder(); /**<  Buffer used to append incomplete data when reading from socket */
-    private boolean isConnected = false; 
-    private long taskId = 0; /**< Counter that will increment on each sent command. Allows to cancel delayed tasks. */
+    private boolean isConnected = false;
 
     /**
     * Main thread method. Loops while the app is open and Bluetooth connection is turned on.
@@ -238,10 +236,9 @@ public class BluetoothHandler extends Thread implements OnEvent {
             return;
         try {
             StringBuilder str = new StringBuilder();
-            str.append(SEP_PACKETS).append(SEP_TASKID).append(taskId).append(SEP_TASKID).append(SEP_DBG).append(cmd).append(SEP_DBG);
+            str.append(SEP_PACKETS).append(SEP_DBG).append(cmd).append(SEP_DBG);
             out.write(str.toString().getBytes());
             Log.d(TAG,"Sending : "+str);
-            taskId++;
         } catch(IOException e) {
             e.printStackTrace();
             if(e.toString().contains("Broken pipe")) {
@@ -265,14 +262,13 @@ public class BluetoothHandler extends Thread implements OnEvent {
             return;
         try {
             StringBuilder str = new StringBuilder();
-            str.append(SEP_PACKETS).append(SEP_TASKID).append(taskId).append(SEP_TASKID).append(SEP_ID).append(id).append(SEP_ID);
+            str.append(SEP_PACKETS).append(SEP_ID).append(id).append(SEP_ID);
             str.append(getTargets());
             str.append(SEP_INT).append(cmd).append(SEP_INT);
-            if(!str.toString().replace(Long.toString(taskId),"").equals(lastIntCmd.replace(Long.toString(taskId-1),""))) {
+            if(!str.toString().equals(lastIntCmd)) {
                 out.write(str.toString().getBytes());
                 lastIntCmd = str.toString();
                 Log.d(TAG, "Sending : " + str);
-                taskId++;
             }
         } catch(IOException e) {
             e.printStackTrace();
@@ -296,14 +292,13 @@ public class BluetoothHandler extends Thread implements OnEvent {
             return;
         try {
             StringBuilder str = new StringBuilder();
-            str.append(SEP_PACKETS).append(SEP_TASKID).append(taskId).append(SEP_TASKID).append(SEP_ID).append(id).append(SEP_ID);
+            str.append(SEP_PACKETS).append(SEP_ID).append(id).append(SEP_ID);
             str.append(getTargets());
             str.append(SEP_BOOL).append(Boolean.toString(cmd).charAt(0)).append(SEP_BOOL);
-            if(!str.toString().replace(Long.toString(taskId),"").equals(lastBoolCmd.replace(Long.toString(taskId-1),""))) {
+            if(!str.toString().equals(lastBoolCmd)) {
                 out.write(str.toString().getBytes());
                 Log.d(TAG, "Sending : " + str);
                 lastBoolCmd = str.toString();
-                taskId++;
             }
         } catch(IOException e) {
             e.printStackTrace();
@@ -326,12 +321,11 @@ public class BluetoothHandler extends Thread implements OnEvent {
             return;
         try {
             StringBuilder str = new StringBuilder();
-            str.append(SEP_PACKETS).append(SEP_TASKID).append(taskId).append(SEP_TASKID).append(SEP_ID).append(id).append(SEP_ID);
+            str.append(SEP_PACKETS).append(SEP_ID).append(id).append(SEP_ID);
             str.append(getTargets());
             str.append(SEP_STR).append(cmd).append(SEP_STR);
             out.write(str.toString().getBytes());
             Log.d(TAG, "Sending : " + str);
-            taskId++;
         } catch(IOException e) {
             e.printStackTrace();
             if(e.toString().contains("Broken pipe")) {
@@ -353,12 +347,11 @@ public class BluetoothHandler extends Thread implements OnEvent {
             return;
         try {
             StringBuilder str = new StringBuilder();
-            str.append(SEP_PACKETS).append(SEP_TASKID).append(taskId).append(SEP_TASKID).append(SEP_ID).append(id).append(SEP_ID);
+            str.append(SEP_PACKETS).append(SEP_ID).append(id).append(SEP_ID);
             str.append(getTargets(target));
             str.append(SEP_STR).append(cmd).append(SEP_STR);
             out.write(str.toString().getBytes());
             Log.d(TAG, "Sending : " + str);
-            taskId++;
         } catch(IOException e) {
             e.printStackTrace();
             if(e.toString().contains("Broken pipe")) {

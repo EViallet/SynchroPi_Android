@@ -24,7 +24,7 @@ public class ControlsFragment extends Fragment implements MotorView.OnValueChang
 
     OnEvent onEventListener;
 
-    int _R = 0, _G = 0, _B = 0;
+    int _R = 88, _G = 226, _B = 120;
     boolean debugMode = false;
 
     EditText ledsText;
@@ -37,6 +37,8 @@ public class ControlsFragment extends Fragment implements MotorView.OnValueChang
         /* ControlViews */
         root.findViewById(R.id.button_circles).setOnClickListener(this);
         root.findViewById(R.id.button_fireworks).setOnClickListener(this);
+        root.findViewById(R.id.button_rainbow).setOnClickListener(this);
+        root.findViewById(R.id.button_square).setOnClickListener(this);
         
         ledsText = root.findViewById(R.id.edittext_text);
         root.findViewById(R.id.button_text).setOnClickListener(this);
@@ -49,6 +51,7 @@ public class ControlsFragment extends Fragment implements MotorView.OnValueChang
         ((SeekBar)root.findViewById(R.id.seek_R)).setOnSeekBarChangeListener(this);
         ((SeekBar)root.findViewById(R.id.seek_G)).setOnSeekBarChangeListener(this);
         ((SeekBar)root.findViewById(R.id.seek_B)).setOnSeekBarChangeListener(this);
+        root.findViewById(R.id.seek_helper).setBackgroundColor(Color.rgb(_R,_G,_B));
         /* MotorViews */
         ((MotorView)root.findViewById(R.id.servo_angle)).setOnValueChangedListener(this);
         ((MotorView)root.findViewById(R.id.servo_angle)).setFullCircle(true);
@@ -119,6 +122,12 @@ public class ControlsFragment extends Fragment implements MotorView.OnValueChang
         switch(id) {
             case R.id.button_circles:
                 onEventListener.send("leds", "circle.py");
+                break;
+            case R.id.button_rainbow:
+                onEventListener.send("leds", "rainbow.py");
+                break;
+            case R.id.button_square:
+                onEventListener.send("leds", "square.py");
                 break;
             case R.id.button_fireworks:
                 onEventListener.send("leds", "feux_artifice.py");

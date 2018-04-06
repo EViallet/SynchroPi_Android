@@ -108,6 +108,9 @@ public class MotorView extends View implements View.OnTouchListener {
 
                     value = (int)normalizedAngle;
 
+                    value*=1024;
+                    value/=360;
+
                 }
 
                 if (listener != null)
