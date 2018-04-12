@@ -8,8 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.gueg.synchropi.Views.LoadingView;
-
+import com.gueg.synchropi.views.LoadingView;
 
 public class SetupFragment extends Fragment {
 

@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     tools:context="com.gueg.synchropi.MainActivity">
 
-    <com.gueg.synchropi.Views.LoadingView
+    <com.gueg.synchropi.views.LoadingView
         android:id="@+id/setup_connect"
         android:layout_width="250dp"
         android:layout_height="250dp"

@@ -1,4 +1,4 @@
-package com.gueg.synchropi.Macs;
+package com.gueg.synchropi.macs;
 
 import android.annotation.SuppressLint;
 import android.content.DialogInterface;

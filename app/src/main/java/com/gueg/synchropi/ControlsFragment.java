@@ -13,7 +13,7 @@ import android.widget.RadioGroup;
 import android.widget.SeekBar;
 import android.widget.Switch;
 
-import com.gueg.synchropi.Views.MotorView;
+import com.gueg.synchropi.views.MotorView;
 
 
 public class ControlsFragment extends Fragment implements MotorView.OnValueChanged, View.OnClickListener, SeekBar.OnSeekBarChangeListener, RadioGroup.OnCheckedChangeListener {

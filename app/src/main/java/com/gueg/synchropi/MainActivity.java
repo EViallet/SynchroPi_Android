@@ -21,12 +21,12 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Toast;
 
-import com.gueg.synchropi.Macs.Mac;
-import com.gueg.synchropi.Macs.MacEditDialog;
-import com.gueg.synchropi.Macs.MacInterface;
-import com.gueg.synchropi.Macs.MacsAdapter;
-import com.gueg.synchropi.Macs.RecyclerItemClickListener;
-import com.gueg.synchropi.Macs.VerticalSpaceItemDecoration;
+import com.gueg.synchropi.macs.Mac;
+import com.gueg.synchropi.macs.MacEditDialog;
+import com.gueg.synchropi.macs.MacInterface;
+import com.gueg.synchropi.macs.MacsAdapter;
+import com.gueg.synchropi.macs.RecyclerItemClickListener;
+import com.gueg.synchropi.macs.VerticalSpaceItemDecoration;
 
 import java.util.ArrayList;
 import java.util.HashSet;

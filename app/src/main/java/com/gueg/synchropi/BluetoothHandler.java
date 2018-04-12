@@ -8,7 +8,7 @@ import android.bluetooth.BluetoothSocket;
 import android.content.Intent;
 import android.util.Log;
 
-import com.gueg.synchropi.Macs.Mac;
+import com.gueg.synchropi.macs.Mac;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -43,6 +43,8 @@ public class BluetoothHandler extends Thread implements OnEvent {
     private OutputStream out; /**< Allows to write to socket */
     private StringBuilder buffer = new StringBuilder(); /**<  Buffer used to append incomplete data when reading from socket */
     private boolean isConnected = false;
+    long pingTimer = 0;
+    private static final long PING_DELAY = 1000L;
 
     /**
     * Main thread method. Loops while the app is open and Bluetooth connection is turned on.
@@ -55,14 +57,17 @@ public class BluetoothHandler extends Thread implements OnEvent {
                 initBluetooth();
             } else {
             	// Checks if the connection is still live by sending it a packet.
-                try {
-                    out.write(PING_CHAR.getBytes());
-                } catch (IOException e) {
-                	// If we couldn't write to the socket, we are disconnected.
-                    if (e.toString().contains("Broken pipe")) {
-                        activity.disconnected();
-                        isConnected = false;
+                if(System.currentTimeMillis()-pingTimer>PING_DELAY) {
+                    try {
+                        out.write(PING_CHAR.getBytes());
+                    } catch (IOException e) {
+                        // If we couldn't write to the socket, we are disconnected.
+                        if (e.toString().contains("Broken pipe")) {
+                            activity.disconnected();
+                            isConnected = false;
+                        }
                     }
+                    pingTimer = System.currentTimeMillis();
                 }
                 // Check if there are any awaiting data.
                 if(isConnected)

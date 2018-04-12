@@ -1,4 +1,4 @@
-package com.gueg.synchropi.Macs;
+package com.gueg.synchropi.macs;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;

@@ -1,4 +1,4 @@
-package com.gueg.synchropi.Views;
+package com.gueg.synchropi.views;
 
 import android.annotation.SuppressLint;
 import android.content.Context;

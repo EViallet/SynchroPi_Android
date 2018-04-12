@@ -205,7 +205,7 @@
 
             android:layout_weight="1"/>
     </LinearLayout>
-    <com.gueg.synchropi.Views.MotorView
+    <com.gueg.synchropi.views.MotorView
         android:id="@+id/servo_angle"
         android:layout_width="130dp"
         android:layout_height="130dp"
@@ -226,7 +226,7 @@
         android:layout_alignStart="@id/servo_angle"
         android:layout_marginStart="50dp"
         android:layout_marginTop="10dp"/>
-    <com.gueg.synchropi.Views.MotorView
+    <com.gueg.synchropi.views.MotorView
         android:id="@+id/servo_speed"
         android:layout_width="130dp"
         android:layout_height="130dp"

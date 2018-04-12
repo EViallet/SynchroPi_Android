@@ -1,4 +1,4 @@
-package com.gueg.synchropi.Macs;
+package com.gueg.synchropi.macs;
 
 /**
  * Wrapper for a device.
