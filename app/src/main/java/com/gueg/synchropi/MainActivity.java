@@ -267,15 +267,17 @@ public class MainActivity extends AppCompatActivity {
      */
     public void disconnected() {
         Toast.makeText(this, R.string.text_disconnected, Toast.LENGTH_SHORT).show();
-        frags.clear();
-        frags.add(setup);
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
+                frags.clear();
+                pagerAdapter.notifyDataSetChanged();
+                frags.add(setup);
+                pagerAdapter.notifyDataSetChanged();
                 tabs.setVisibility(View.GONE);
+                pager.setCurrentItem(0);
             }
         });
-        pagerAdapter.notifyDataSetChanged();
     }
 
     /**
@@ -286,7 +288,7 @@ public class MainActivity extends AppCompatActivity {
         return macs;
     }
 
-    // TODO standby? shift?
+
     public ArrayList<Mac> getSelectedMacs() {
         ArrayList<Mac> selected = new ArrayList<>();
         int selectedCount = 0;
@@ -299,6 +301,10 @@ public class MainActivity extends AppCompatActivity {
         if(selectedCount==macs.size())
             return null;
         return selected;
+    }
+
+    public void setRotating(int pi1, int pi2, boolean rotating) {
+        servo.setServoRotating(pi1, pi2, rotating);
     }
 
     /**

@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.Spinner;
 
 import java.util.ArrayList;
@@ -25,6 +26,9 @@ public class ServoFragment extends Fragment implements View.OnClickListener {
     Spinner servo2;
     Spinner servo3;
     Spinner servo4;
+
+    boolean servosRotating1 = false;
+    boolean servosRotating2 = false;
 
     @Nullable
     @Override
@@ -75,6 +79,35 @@ public class ServoFragment extends Fragment implements View.OnClickListener {
                     listener.send("servo_sync","ccw_S_"+servo3.getSelectedItem(),mac4);
                 }
                 break;
+        }
+    }
+
+    public void setServoRotating(int pi1, int pi2, boolean rotating) {
+        if(pi1==Integer.decode(servo1.getSelectedItem().toString())&&pi2==Integer.decode(servo2.getSelectedItem().toString()))
+            servosRotating1 = rotating;
+        else
+            servosRotating2 = rotating;
+        updateButtons();
+    }
+
+    private void updateButtons() {
+        if(!servosRotating1) {
+            ((Button) root.findViewById(R.id.servo_btn_1)).setText("Démarrer");
+            servo1.setEnabled(true);
+            servo2.setEnabled(true);
+        } else {
+            ((Button) root.findViewById(R.id.servo_btn_1)).setText("Arrêter");
+            servo1.setEnabled(false);
+            servo2.setEnabled(false);
+        }
+        if(!servosRotating2) {
+            ((Button) root.findViewById(R.id.servo_btn_2)).setText("Démarrer");
+            servo3.setEnabled(true);
+            servo4.setEnabled(true);
+        } else {
+            ((Button) root.findViewById(R.id.servo_btn_2)).setText("Arrêter");
+            servo3.setEnabled(false);
+            servo4.setEnabled(false);
         }
     }
 

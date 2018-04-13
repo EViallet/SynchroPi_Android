@@ -136,6 +136,7 @@ public class ControlsFragment extends Fragment implements MotorView.OnValueChang
                 onEventListener.send("leds", "message.py "+ledsText.getText().toString()+" "+Integer.toString(_R)+" "+Integer.toString(_G)+" "+Integer.toString(_B));
                 break;
             case R.id.btn_disconnect:
+                activity.disconnected();
                 break;
             case R.id.btn_debug:
                 debugMode = !debugMode;

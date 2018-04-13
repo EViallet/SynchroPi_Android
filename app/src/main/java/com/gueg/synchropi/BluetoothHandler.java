@@ -35,6 +35,10 @@ public class BluetoothHandler extends Thread implements OnEvent {
     public static final String SEP_BOOL = "$";
     public static final String SEP_STR = "*";
     public static final String SEP_MAC = "^";
+    public static final String SEP_SERVOS = "!";
+    public static final String SEP_MAC_ME = "PiMe";
+    public static final String SEP_MAC_OTHER_CO = "PiCo";
+    public static final String SEP_MAC_OTHER_DECO = "PiDe";
 
     private BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter(); /**< Default android bluetooth adapter. */
     private BluetoothSocket socket; /**< Will try to connect to any open QBluetoothServer on channel PI_UUID @see PI_UUID @see initBluetooth() */
@@ -102,12 +106,14 @@ public class BluetoothHandler extends Thread implements OnEvent {
                                     activity.runOnUiThread(new Runnable() {
                                         @Override
                                         public void run() {
-                                            if (cmd.contains("PiMe"))
-                                                activity.setBTIp(Integer.decode(cmd.replace(SEP_MAC, "").replace("PiMe", "")));
-                                            else if (cmd.contains("PiCo"))
-                                                activity.macConnected(cmd.replace(SEP_MAC, "").replace("PiCo", "").substring(0, cmd.replace(SEP_MAC, "").replace("PiCo", "").length()-1), Integer.decode(cmd.replace(SEP_MAC, "").replace("PiCo", "").substring(cmd.replace(SEP_MAC, "").replace("PiCo", "").length()-1)));
-                                            else if (cmd.contains("PiDe"))
-                                                activity.macDisconnected(cmd.replace(SEP_MAC, "").replace("PiDe", ""));
+                                            if (cmd.contains(SEP_MAC_ME))
+                                                activity.setBTIp(Integer.decode(cmd.replace(SEP_MAC, "").replace(SEP_MAC_ME, "")));
+                                            else if (cmd.contains(SEP_MAC_OTHER_CO))
+                                                activity.macConnected(cmd.replace(SEP_MAC, "").replace(SEP_MAC_OTHER_CO, "").substring(0, cmd.replace(SEP_MAC, "").replace("PiCo", "").length()-1), Integer.decode(cmd.replace(SEP_MAC, "").replace("PiCo", "").substring(cmd.replace(SEP_MAC, "").replace("PiCo", "").length()-1)));
+                                            else if (cmd.contains(SEP_MAC_OTHER_DECO))
+                                                activity.macDisconnected(cmd.replace(SEP_MAC, "").replace(SEP_MAC_OTHER_DECO, ""));
+                                            else if(cmd.contains(SEP_SERVOS))
+                                                activity.setRotating((int)cmd.replace(SEP_MAC,"").replace(SEP_SERVOS,"").charAt(0),(int)cmd.replace(SEP_MAC,"").replace(SEP_SERVOS,"").charAt(1),cmd.replace(SEP_MAC,"").replace(SEP_SERVOS,"").charAt(2)=='t');
                                         }
                                     });
                                 }
